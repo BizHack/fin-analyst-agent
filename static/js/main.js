@@ -79,6 +79,13 @@ function initializeStockSelector(stockSelect) {
             el.textContent = selectedStock;
         });
         
+        // Sync all stock selectors to the same value
+        document.querySelectorAll('select[id^="stock-select-"]').forEach(select => {
+            if (select !== stockSelect) {
+                select.value = selectedStock;
+            }
+        });
+        
         // Load new data for the selected stock via AJAX
         loadStockData(selectedStock);
         

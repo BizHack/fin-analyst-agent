@@ -1,0 +1,18 @@
+/* finHackers Custom CSS */
+.glassmorphism {
+    background-color: rgba(22, 28, 36, 0.8);
+    border: 1px solid rgba(66, 153, 225, 0.25);
+    backdrop-filter: blur(8px);
+    border-radius: 10px;
+}
+
+.gradient-text {
+    background: linear-gradient(to right, #3b82f6, #10b981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.bg-gradient-dark {
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    background-attachment: fixed;
+}

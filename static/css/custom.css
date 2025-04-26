@@ -71,6 +71,16 @@ h1, h2, h3, h4, h5, h6 {
   to { transform: translateY(0); opacity: 1; }
 }
 
+/* Dropdown select styling for better visibility */
+select option {
+  color: #000000 !important;
+  background-color: #ffffff;
+}
+
+#stock-select {
+  color: #000000 !important;
+}
+
 /* Responsive adjustments */
 @media (max-width: 640px) {
   .container {

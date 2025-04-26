@@ -625,18 +625,40 @@
                 
                 <!-- Fundamental Tab -->
                 <div id="fundamental-tab" class="tab-panel hidden">
+                    <!-- Header with stock selector -->
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-semibold text-black">Market Intelligence</h3>
+                        <div class="flex items-center">
+                            <label for="stock-select-fundamentals" class="text-sm font-medium text-black mr-3">
+                                Selected Stock:
+                            </label>
+                            <select
+                                id="stock-select-fundamentals"
+                                class="bg-white border border-gray-200 rounded-md px-3 py-1.5 text-sm text-black focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent"
+                            >
+                                <option value="AAPL">AAPL - Apple Inc.</option>
+                                <option value="MSFT">MSFT - Microsoft Corp.</option>
+                                <option value="GOOGL" selected>GOOGL - Alphabet Inc.</option>
+                                <option value="AMZN">AMZN - Amazon.com Inc.</option>
+                                <option value="TSLA">TSLA - Tesla Inc.</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Content Grid -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Left Column - Fundamental Analysis -->
                         <div class="lg:col-span-2">
                             <div class="flex items-center mb-4">
                                 <span class="text-blue-500 mr-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                                 </span>
-                                <h3 class="text-xl font-semibold text-black">Fundamental Analysis - <span class="ticker-symbol">AAPL</span></h3>
+                                <h3 class="text-xl font-semibold text-black">Fundamental Analysis - GOOGL</h3>
                             </div>
                             <p class="text-black mb-4">Earnings reports and financial metrics</p>
                             
                             <div id="company-summary" class="text-black mb-6">
-                                Apple continues to display strong fundamental metrics with a 15% year-over-year revenue growth and expanding profit margins. Recent earnings call highlighted significant growth in services revenue, now accounting for 25% of total revenue. Management emphasized AI integration plans for upcoming product lines. Balance sheet remains exceptionally strong with $195B cash and short-term investments.
+                                Alphabet reported mixed fundamentals with 18% revenue growth but declining margins due to aggressive AI investments. Search revenue remains strong while YouTube growth accelerated. Cloud division achieved profitability for the first time. Management faced numerous analyst questions about AI competition and the timeline for AI investment returns during the earnings call.
                             </div>
                             
                             <!-- Quarterly Performance Chart -->
@@ -649,9 +671,9 @@
                                             <!-- Q2 2024 -->
                                             <div class="flex flex-col items-center mx-1 flex-1">
                                                 <div class="w-full flex space-x-1">
-                                                    <div class="bg-blue-400 h-[180px] w-1/3"></div>
-                                                    <div class="bg-black h-[60px] w-1/3"></div>
-                                                    <div class="bg-green-500 h-[170px] w-1/3"></div>
+                                                    <div class="bg-blue-400 h-[70px] w-1/3"></div>
+                                                    <div class="bg-black h-[20px] w-1/3"></div>
+                                                    <div class="bg-green-500 h-[70px] w-1/3"></div>
                                                 </div>
                                                 <div class="text-black text-sm mt-2">Q2 2024</div>
                                             </div>
@@ -659,9 +681,9 @@
                                             <!-- Q3 2024 -->
                                             <div class="flex flex-col items-center mx-1 flex-1">
                                                 <div class="w-full flex space-x-1">
-                                                    <div class="bg-blue-400 h-[185px] w-1/3"></div>
-                                                    <div class="bg-black h-[60px] w-1/3"></div>
-                                                    <div class="bg-green-500 h-[175px] w-1/3"></div>
+                                                    <div class="bg-blue-400 h-[73px] w-1/3"></div>
+                                                    <div class="bg-black h-[20px] w-1/3"></div>
+                                                    <div class="bg-green-500 h-[72px] w-1/3"></div>
                                                 </div>
                                                 <div class="text-black text-sm mt-2">Q3 2024</div>
                                             </div>
@@ -669,9 +691,9 @@
                                             <!-- Q4 2024 -->
                                             <div class="flex flex-col items-center mx-1 flex-1">
                                                 <div class="w-full flex space-x-1">
-                                                    <div class="bg-blue-400 h-[190px] w-1/3"></div>
-                                                    <div class="bg-black h-[60px] w-1/3"></div>
-                                                    <div class="bg-green-500 h-[180px] w-1/3"></div>
+                                                    <div class="bg-blue-400 h-[77px] w-1/3"></div>
+                                                    <div class="bg-black h-[20px] w-1/3"></div>
+                                                    <div class="bg-green-500 h-[73px] w-1/3"></div>
                                                 </div>
                                                 <div class="text-black text-sm mt-2">Q4 2024</div>
                                             </div>
@@ -679,9 +701,9 @@
                                             <!-- Q1 2025 -->
                                             <div class="flex flex-col items-center mx-1 flex-1">
                                                 <div class="w-full flex space-x-1">
-                                                    <div class="bg-blue-400 h-[200px] w-1/3"></div>
-                                                    <div class="bg-black h-[70px] w-1/3"></div>
-                                                    <div class="bg-green-500 h-[190px] w-1/3"></div>
+                                                    <div class="bg-blue-400 h-[80px] w-1/3"></div>
+                                                    <div class="bg-black h-[21px] w-1/3"></div>
+                                                    <div class="bg-green-500 h-[77px] w-1/3"></div>
                                                 </div>
                                                 <div class="text-black text-sm mt-2">Q1 2025</div>
                                             </div>
@@ -717,7 +739,7 @@
                                         <div class="space-y-2">
                                             <div class="flex justify-between pb-2 border-b border-gray-100">
                                                 <span class="text-black">Revenue</span>
-                                                <span class="text-black font-medium">Q1 2025: $96.5B (+15%)</span>
+                                                <span class="text-black font-medium">Q1 2025: $78.2B (+18%)</span>
                                             </div>
                                             <div class="flex justify-between pb-2 border-b border-gray-100">
                                                 <span class="text-black">EPS</span>
@@ -773,7 +795,7 @@
                             </div>
                         </div>
                         
-                        <!-- Analyst Consensus Card -->
+                        <!-- Right Column - Analyst Consensus -->
                         <div>
                             <div class="flex items-center mb-4">
                                 <span class="text-blue-500 mr-2">
@@ -798,7 +820,7 @@
                                 <div class="mb-4">
                                     <div class="flex justify-between text-sm mb-1">
                                         <span class="text-black">Price Target</span>
-                                        <span class="text-black font-medium">$225 (+10%)</span>
+                                        <span class="text-black font-medium">$190 (+9%)</span>
                                     </div>
                                     <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
                                         <div class="h-full bg-blue-400" style="width: 75%"></div>
@@ -810,19 +832,19 @@
                                     <div>
                                         <div class="flex justify-between text-sm mb-1">
                                             <span class="text-black">Strong Buy</span>
-                                            <span class="text-black">18/35</span>
+                                            <span class="text-black">16/35</span>
                                         </div>
                                         <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                                            <div class="h-full bg-blue-400" style="width: 51%"></div>
+                                            <div class="h-full bg-blue-400" style="width: 46%"></div>
                                         </div>
                                     </div>
                                     <div>
                                         <div class="flex justify-between text-sm mb-1">
                                             <span class="text-black">Buy</span>
-                                            <span class="text-black">12/35</span>
+                                            <span class="text-black">14/35</span>
                                         </div>
                                         <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                                            <div class="h-full bg-blue-400" style="width: 34%"></div>
+                                            <div class="h-full bg-blue-400" style="width: 40%"></div>
                                         </div>
                                     </div>
                                     <div>
@@ -849,15 +871,15 @@
                                 <div class="space-y-2">
                                     <div class="flex justify-between pb-2 border-b border-gray-100">
                                         <span class="text-black">Revenue Est (FY25)</span>
-                                        <span class="text-black font-medium">$390.2B</span>
+                                        <span class="text-black font-medium">$335.8B</span>
                                     </div>
                                     <div class="flex justify-between pb-2 border-b border-gray-100">
                                         <span class="text-black">EPS Est (FY25)</span>
-                                        <span class="text-black font-medium">$6.85</span>
+                                        <span class="text-black font-medium">$8.25</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-black">Growth Est (5yr)</span>
-                                        <span class="text-black font-medium">12.5%</span>
+                                        <span class="text-black font-medium">14.8%</span>
                                     </div>
                                 </div>
                             </div>

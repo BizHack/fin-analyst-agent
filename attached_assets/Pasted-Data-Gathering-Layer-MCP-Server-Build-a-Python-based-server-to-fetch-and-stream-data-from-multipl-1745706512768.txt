@@ -1,0 +1,96 @@
+Data Gathering Layer (MCP Server)
+
+Build a Python-based server to fetch and stream data from multiple sources:
+
+News: CNBC, MSN Finance, Yahoo Finance.
+
+Social Media: Twitter (X), Reddit, Truth Social.
+
+Politician Trades: Capitol Trades, Senate Stock Watcher.
+
+Earnings Call Filings: SEC EDGAR database (10-Ks, 10-Qs).
+
+Market Prices: Yahoo Finance, TradingView API.
+
+Analyst Research Reports: UBS, Citi, Morgan Stanley, Wells Fargo, Goldman Sachs, JP Morgan, Barclays, Bank of America Merrill Lynch (scrape or use APIs if available).
+
+Implementation Notes:
+
+Use asyncio and aiohttp for concurrent scraping/fetching.
+
+Dockerize this service as mcp-server.
+
+Processing Layer (MCP Client + VectorDB + Langraph Workflow Manager)
+
+Create a second dockerized service:
+
+MCP Client:
+
+Pull data from mcp-server.
+
+Preprocess and clean data.
+
+VectorDB:
+
+Use ChromaDB or Milvus to store documents in vector embeddings.
+
+Use Antropic LLM for text embedding generation.
+
+Langraph Workflow Manager:
+
+Parallelize pipelines for each source (News, Social, Politician, Earnings, Analyst Reports).
+
+Summarize, sentiment-analyze, and classify content.
+
+Aggregate the structured results.
+
+Push summarized and enriched outputs into MongoDB.
+
+Implementation Notes:
+
+Use Langraph to orchestrate workflows.
+
+Store final processed data into MongoDB (organized by source and analysis type).
+
+Backend Layer (FastAPI Server)
+
+Create a FastAPI backend docker:
+
+Fetch processed data from MongoDB.
+
+Expose API endpoints to serve:
+
+Sentiment Analysis
+
+Politician Trades
+
+Technical Analysis
+
+Fundamental Analysis
+
+Authenticate API requests if needed.
+
+Frontend Layer (Already Built UI)
+
+Connect UI frontend to the FastAPI backend.
+
+Each UI tab (Sentiment, Politician Trades, Technical, Fundamentals) fetches relevant processed data.
+
+Overall Architecture Overview:
+
+Docker containers:
+
+mcp-server (fetch raw data)
+
+mcp-client + vectordb + workflow (process, analyze, and store)
+
+backend-api (serve the processed data to UI)
+
+Using MongoDB for processed data storage.
+
+Using Antropic LLM for text analysis and vector embeddings.
+
+Using Langraph for workflow orchestration and parallel task management.
+
+Replit AI should help modularize the project into separate services, each with its own Dockerfile and Compose file if necessary.
+

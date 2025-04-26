@@ -1,5 +1,5 @@
 """
-News Agent - Analyzes earnings reports and fundamental data
+News Agent - Analyzes earnings reports, fundamental data, and news sentiment
 """
 import logging
 import yfinance as yf
@@ -7,6 +7,144 @@ import datetime
 import random
 
 logger = logging.getLogger(__name__)
+
+def analyze_news_sentiment(ticker):
+    """
+    Analyze news articles and their sentiment for a specific ticker
+    
+    Args:
+        ticker (str): Stock ticker symbol to analyze
+    
+    Returns:
+        dict: News articles with sentiment analysis
+    """
+    logger.debug(f"Analyzing news sentiment for {ticker}")
+    
+    try:
+        # In a production environment, this would fetch actual news from sources 
+        # like Yahoo Finance, CNBC, Bloomberg, MSN Money using their APIs
+        
+        # News sources with their styling properties
+        sources = {
+            "Yahoo Finance": {
+                "icon": "Y!",
+                "bg_color": "bg-purple-50",
+                "text_color": "text-blue-600"
+            },
+            "CNBC": {
+                "icon": "C",
+                "bg_color": "bg-blue-50",
+                "text_color": "text-blue-500"
+            },
+            "Bloomberg": {
+                "icon": "B",
+                "bg_color": "bg-gray-100",
+                "text_color": "text-gray-800"
+            },
+            "MSN Money": {
+                "icon": "M",
+                "bg_color": "bg-blue-100",
+                "text_color": "text-blue-900"
+            }
+        }
+        
+        # Generate sample news articles with sentiment scores
+        # Sentiment scale: 0-0.3 (negative), 0.3-0.7 (neutral), 0.7-1.0 (positive)
+        news_articles = []
+        
+        # Yahoo Finance articles
+        news_articles.append({
+            "title": f"{ticker} Beats Earnings Expectations",
+            "summary": f"{ticker} reported quarterly earnings above analyst expectations, driven by strong product demand",
+            "date": "2h ago",
+            "source": "Yahoo Finance",
+            "sentiment_score": round(random.uniform(0.7, 0.95), 2),
+            "sentiment": "positive",
+            "url": f"https://finance.yahoo.com/news/{ticker.lower()}-earnings"
+        })
+        
+        # CNBC articles
+        news_articles.append({
+            "title": f"Analyst Raises {ticker} Price Target",
+            "summary": f"Leading Wall Street analyst upgrades {ticker} citing product innovation and market expansion",
+            "date": "4h ago",
+            "source": "CNBC",
+            "sentiment_score": round(random.uniform(0.65, 0.85), 2),
+            "sentiment": "positive",
+            "url": f"https://www.cnbc.com/quotes/{ticker.lower()}"
+        })
+        
+        # Bloomberg articles
+        news_articles.append({
+            "title": f"{ticker} Facing Supply Chain Challenges",
+            "summary": f"Global supply constraints could impact {ticker}'s production schedule for the coming quarter",
+            "date": "1d ago",
+            "source": "Bloomberg",
+            "sentiment_score": round(random.uniform(0.25, 0.45), 2),
+            "sentiment": "negative",
+            "url": f"https://www.bloomberg.com/quote/{ticker}"
+        })
+        
+        # MSN Money articles
+        news_articles.append({
+            "title": f"{ticker} Announces Share Buyback Program",
+            "summary": f"Board approves $10B share repurchase program, signaling confidence in company outlook",
+            "date": "2d ago",
+            "source": "MSN Money",
+            "sentiment_score": round(random.uniform(0.6, 0.8), 2),
+            "sentiment": "positive",
+            "url": f"https://www.msn.com/en-us/money/stockdetails/{ticker.lower()}"
+        })
+        
+        # Add one more article with mixed sentiment
+        if random.random() > 0.5:
+            source = random.choice(list(sources.keys()))
+            news_articles.append({
+                "title": f"{ticker} Earnings Mixed Despite Revenue Growth",
+                "summary": f"While {ticker} reported strong revenue, margins came under pressure from rising costs",
+                "date": "3d ago",
+                "source": source,
+                "sentiment_score": round(random.uniform(0.4, 0.6), 2),
+                "sentiment": "neutral",
+                "url": "#"
+            })
+        
+        # Calculate average sentiment
+        avg_sentiment = sum(article["sentiment_score"] for article in news_articles) / len(news_articles)
+        sentiment_label = "neutral"
+        if avg_sentiment >= 0.7:
+            sentiment_label = "positive"
+        elif avg_sentiment < 0.4:
+            sentiment_label = "negative"
+        
+        # Add source styling info to each article
+        for article in news_articles:
+            source = article["source"]
+            if source in sources:
+                article.update({
+                    "icon": sources[source]["icon"],
+                    "bg_color": sources[source]["bg_color"],
+                    "text_color": sources[source]["text_color"]
+                })
+        
+        return {
+            "news_articles": news_articles,
+            "avg_sentiment": round(avg_sentiment, 2),
+            "sentiment_label": sentiment_label,
+            "source_count": len(set(article["source"] for article in news_articles)),
+            "sources": sources
+        }
+    
+    except Exception as e:
+        logger.error(f"Error analyzing news sentiment for {ticker}: {e}")
+        return {
+            "news_articles": [],
+            "avg_sentiment": 0.5,
+            "sentiment_label": "neutral",
+            "source_count": 0,
+            "sources": sources,
+            "error": str(e)
+        }
 
 def analyze_news(ticker):
     """

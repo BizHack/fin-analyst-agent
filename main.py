@@ -223,5 +223,26 @@ def simulate_event():
     else:
         return jsonify({"error": "Invalid event type"}), 400
 
+@app.route('/health')
+def health_check():
+    """Health check endpoint for Docker container monitoring."""
+    try:
+        # Check database connection
+        with models.db.engine.connect() as conn:
+            conn.execute("SELECT 1")
+        
+        return jsonify({
+            "status": "healthy",
+            "database": "connected",
+            "timestamp": datetime.now().isoformat()
+        })
+    except Exception as e:
+        logger.error(f"Health check failed: {str(e)}")
+        return jsonify({
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

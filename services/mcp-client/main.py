@@ -158,6 +158,258 @@ async def save_to_vectordb(collection_name, documents, metadata=None):
         return False
 
 # Define Langraph Workflow
+def create_social_media_processing_workflow():
+    """Create a workflow for processing social media data."""
+    
+    # Define nodes
+    @Node()
+    async def fetch_social_media(source, ticker=None):
+        """Fetch social media data from MCP Server."""
+        params = {}
+        if ticker:
+            params["ticker"] = ticker
+            
+        data = await fetch_data_from_mcp_server("social", source, params)
+        if not data:
+            return {"status": "error", "message": f"Failed to fetch social media data from {source}"}
+        return {"status": "success", "data": data, "ticker": ticker}
+    
+    @Node()
+    async def extract_content(data):
+        """Extract and clean content from social media posts."""
+        if data["status"] != "success":
+            return data
+        
+        posts = data["data"]["data"]
+        ticker = data.get("ticker")
+        cleaned_posts = []
+        
+        for post in posts:
+            # Create a standardized post object
+            cleaned_post = {
+                "title": post.get("title", ""),
+                "author": post.get("author", ""),
+                "content": post.get("content", post.get("selftext", "")),
+                "url": post.get("url", ""),
+                "created_utc": post.get("created_utc", ""),
+                "source": post.get("source", data["data"]["source"]),
+                "score": post.get("score", 0),
+                "ticker": ticker
+            }
+            cleaned_posts.append(cleaned_post)
+        
+        return {
+            "status": "success", 
+            "posts": cleaned_posts, 
+            "ticker": ticker,
+            "source": data["data"]["source"]
+        }
+    
+    @Node()
+    async def analyze_sentiment(data):
+        """Analyze sentiment of social media posts using Anthropic."""
+        if data["status"] != "success":
+            return data
+        
+        posts = data["posts"]
+        ticker = data.get("ticker")
+        source = data.get("source")
+        results = []
+        
+        # Process posts in batches to avoid hitting API limits
+        batch_size = 5
+        for i in range(0, len(posts), batch_size):
+            batch = posts[i:i+batch_size]
+            
+            # Skip empty content
+            batch = [post for post in batch if post.get("content") or post.get("title")]
+            
+            if not batch:
+                continue
+                
+            # Create a prompt for Claude to analyze all posts in the batch
+            prompt = f"""You are a financial sentiment analyzer. Please analyze the sentiment of the following social media posts about {ticker if ticker else 'the market'}.
+
+For each post, provide:
+1. A sentiment score from 0 to 1 (0 being extremely negative, 0.5 being neutral, 1 being extremely positive)
+2. A short reason for the sentiment score (max 20 words)
+3. Key topics mentioned in the post (comma-separated)
+
+Please format your response as a JSON array where each item has these fields: post_index, sentiment_score, reason, topics.
+
+Here are the posts:
+
+"""
+            
+            for j, post in enumerate(batch):
+                prompt += f"\n--- Post {j+1} ---\n"
+                if post.get("title"):
+                    prompt += f"Title: {post['title']}\n"
+                if post.get("content"):
+                    prompt += f"Content: {post['content']}\n"
+                prompt += f"Source: {post['source']}\n"
+                prompt += f"Author: {post['author']}\n"
+                
+            prompt += "\nAnalysis in JSON format:"
+            
+            try:
+                # Log that we're using Anthropic for sentiment analysis
+                logger.info(f"Using Anthropic Claude API for sentiment analysis of {source} posts about {ticker if ticker else 'general market'}")
+                
+                # Use Claude with JSON response format
+                response = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=2000,
+                    temperature=0,
+                    system="You are a financial sentiment analysis expert. Always respond with valid JSON.",
+                    messages=[
+                        {"role": "user", "content": prompt}
+                    ],
+                    response_format={"type": "json_object"}
+                )
+                
+                # Log successful API call
+                logger.info(f"Successfully called Anthropic API for sentiment analysis of {len(batch)} posts")
+                
+                # Parse the response
+                analysis = json.loads(response.content[0].text)
+                
+                # Add analysis to each post
+                for item in analysis.get("analysis", []):
+                    post_idx = item.get("post_index", 1) - 1
+                    if 0 <= post_idx < len(batch):
+                        batch[post_idx]["analysis"] = {
+                            "sentiment_score": item.get("sentiment_score", 0.5),
+                            "reason": item.get("reason", ""),
+                            "topics": item.get("topics", "").split(",")
+                        }
+                
+                # Add analyzed posts to results
+                results.extend(batch)
+                
+            except Exception as e:
+                logger.error(f"Error analyzing sentiment with Claude: {str(e)}")
+                # Add unanalyzed posts to results
+                for post in batch:
+                    post["analysis"] = {
+                        "sentiment_score": 0.5,
+                        "reason": "Analysis failed",
+                        "topics": []
+                    }
+                results.extend(batch)
+        
+        # Calculate overall sentiment
+        if results:
+            overall_sentiment = sum(post.get("analysis", {}).get("sentiment_score", 0.5) for post in results) / len(results)
+            
+            # Extract trending topics
+            all_topics = []
+            for post in results:
+                all_topics.extend(post.get("analysis", {}).get("topics", []))
+            
+            # Count topics
+            topic_counts = {}
+            for topic in all_topics:
+                topic = topic.strip()
+                if topic:
+                    topic_counts[topic] = topic_counts.get(topic, 0) + 1
+            
+            # Get top topics
+            trending_topics = sorted(topic_counts.keys(), key=lambda x: topic_counts[x], reverse=True)[:5]
+        else:
+            overall_sentiment = 0.5
+            trending_topics = []
+        
+        return {
+            "status": "success",
+            "posts": results,
+            "overall_sentiment": overall_sentiment,
+            "trending_topics": trending_topics,
+            "ticker": ticker,
+            "source": source
+        }
+    
+    @Node()
+    async def save_to_database(data):
+        """Save processed social media data to MongoDB and VectorDB."""
+        if data["status"] != "success":
+            return data
+        
+        posts = data["posts"]
+        ticker = data.get("ticker")
+        source = data.get("source")
+        
+        # Prepare data for MongoDB
+        mongo_data = {
+            "type": "social_media",
+            "source": source,
+            "ticker": ticker,
+            "timestamp": datetime.now().isoformat(),
+            "overall_sentiment": data["overall_sentiment"],
+            "trending_topics": data["trending_topics"],
+            "posts": posts
+        }
+        
+        # Save to MongoDB
+        try:
+            result = db.social_media_data.insert_one(mongo_data)
+            mongo_id = str(result.inserted_id)
+            logger.info(f"Saved to MongoDB with ID: {mongo_id}")
+        except Exception as e:
+            logger.error(f"Error saving to MongoDB: {str(e)}")
+            mongo_id = None
+        
+        # Prepare data for VectorDB
+        documents = []
+        metadata = []
+        for post in posts:
+            # Create document text
+            doc_text = f"Title: {post.get('title', '')}\n"
+            doc_text += f"Source: {post.get('source', '')}\n"
+            doc_text += f"Author: {post.get('author', '')}\n"
+            doc_text += f"Ticker: {ticker}\n" if ticker else ""
+            doc_text += f"Content: {post.get('content', '')}\n"
+            
+            # Create metadata
+            meta = {
+                "title": post.get("title", ""),
+                "source": post.get("source", ""),
+                "url": post.get("url", ""),
+                "created_utc": post.get("created_utc", ""),
+                "sentiment": post.get("analysis", {}).get("sentiment_score", 0.5),
+                "topics": ",".join(post.get("analysis", {}).get("topics", [])),
+                "ticker": ticker
+            }
+            
+            documents.append(doc_text)
+            metadata.append(meta)
+        
+        # Save to VectorDB
+        vectordb_success = await save_to_vectordb("social_media", documents, metadata)
+        
+        return {
+            "status": "success", 
+            "mongo_id": mongo_id, 
+            "vectordb_success": vectordb_success,
+            "document_count": len(documents),
+            "overall_sentiment": data["overall_sentiment"],
+            "trending_topics": data["trending_topics"]
+        }
+    
+    # Create the graph
+    workflow = Graph()
+    workflow.add_node("fetch_social_media", fetch_social_media)
+    workflow.add_node("extract_content", extract_content)
+    workflow.add_node("analyze_sentiment", analyze_sentiment)
+    workflow.add_node("save_to_database", save_to_database)
+    
+    # Connect nodes
+    workflow.add_edge("fetch_social_media", "extract_content")
+    workflow.add_edge("extract_content", "analyze_sentiment")
+    workflow.add_edge("analyze_sentiment", "save_to_database")
+    
+    return workflow
+
 def create_news_processing_workflow():
     """Create a workflow for processing news data."""
     
@@ -302,6 +554,59 @@ async def health_check():
         "uptime": uptime,
         "version": "1.0.0"
     }
+
+@app.post("/process/social-media")
+async def process_social_media(background_tasks: BackgroundTasks, request: DataRequest):
+    """Process social media data from MCP Server."""
+    source_name = request.source_name
+    ticker = request.params.get("ticker") if request.params else None
+    
+    # Generate workflow ID
+    workflow_id = f"social_{source_name}_{ticker or 'general'}_{datetime.now().timestamp()}"
+    
+    # Create and store workflow
+    workflow = create_social_media_processing_workflow()
+    WORKFLOWS[workflow_id] = {
+        "workflow": workflow,
+        "status": "created",
+        "created_at": datetime.now().isoformat(),
+        "updated_at": datetime.now().isoformat(),
+        "progress": 0.0,
+        "details": {}
+    }
+    
+    # Run workflow in background
+    async def run_workflow():
+        try:
+            # Update status
+            WORKFLOWS[workflow_id]["status"] = "running"
+            WORKFLOWS[workflow_id]["updated_at"] = datetime.now().isoformat()
+            
+            # Run workflow
+            result = await workflow.ainvoke(source_name, ticker=ticker)
+            
+            # Update status
+            WORKFLOWS[workflow_id]["status"] = "completed"
+            WORKFLOWS[workflow_id]["updated_at"] = datetime.now().isoformat()
+            WORKFLOWS[workflow_id]["progress"] = 1.0
+            WORKFLOWS[workflow_id]["details"] = {
+                "result": result,
+                "completed_at": datetime.now().isoformat()
+            }
+        except Exception as e:
+            logger.error(f"Error running social media workflow: {str(e)}")
+            # Update status
+            WORKFLOWS[workflow_id]["status"] = "failed"
+            WORKFLOWS[workflow_id]["updated_at"] = datetime.now().isoformat()
+            WORKFLOWS[workflow_id]["details"] = {
+                "error": str(e),
+                "failed_at": datetime.now().isoformat()
+            }
+    
+    # Schedule workflow
+    background_tasks.add_task(run_workflow)
+    
+    return {"message": "Social media processing scheduled", "workflow_id": workflow_id}
 
 @app.post("/process/news")
 async def process_news(background_tasks: BackgroundTasks, request: DataRequest):

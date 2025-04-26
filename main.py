@@ -198,12 +198,35 @@ def analyze_ticker():
             except Exception as e:
                 logger.error(f"Error getting sentiment data from Backend API: {str(e)}")
                 # Fallback to existing implementation
-                from agents.trump_agent import analyze_trump_posts
-                social_posts = analyze_trump_posts(ticker)
-                sentiment_summary = f"Based on recent social media analysis, {ticker} shows mixed sentiment with trending discussions about quarterly earnings and product launches."
+                from agents.social_media_aggregator import analyze_aggregated_social_media
+                
+                # This will combine data from both Reddit and Truth Social
+                social_data = analyze_aggregated_social_media(ticker)
+                
+                # Process the social data
+                posts = social_data.get("posts", [])
+                sentiment_score = social_data.get("sentiment_score", 0.5)
+                
+                # Determine sentiment type based on score
+                if sentiment_score > 0.7:
+                    sentiment_type = "strongly positive"
+                elif sentiment_score > 0.5:
+                    sentiment_type = "moderately positive"
+                elif sentiment_score > 0.4:
+                    sentiment_type = "neutral"
+                elif sentiment_score > 0.2:
+                    sentiment_type = "moderately negative"
+                else:
+                    sentiment_type = "strongly negative"
+                
+                trending_topics = ", ".join(social_data.get("trending_topics", ["earnings", "product launches"]))
+                sources = ", ".join(social_data.get("sources", ["Reddit", "Truth Social"]))
+                
+                sentiment_summary = f"Based on recent analysis from {sources}, {ticker} shows {sentiment_type} sentiment with trending discussions about {trending_topics}."
+                
                 return render_template('sentiment.html', 
                                     ticker=ticker, 
-                                    posts=social_posts, 
+                                    posts=posts, 
                                     summary=sentiment_summary)
             
         elif tab_type == 'politician_trades':

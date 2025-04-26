@@ -226,58 +226,116 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
 # Sentiment Analysis API Routes
 @app.get("/sentiment/{ticker}")
 async def get_sentiment_analysis(ticker: str, current_user: User = Depends(get_current_active_user)):
-    """Get sentiment analysis for a ticker."""
+    """Get sentiment analysis for a ticker from both news and social media."""
     try:
-        collection = db["news_analysis"]
-        
-        # Find documents with the ticker in title, content, or key_entities
-        cursor = collection.find({
+        # Get news sentiment data
+        news_collection = db["news_analysis"]
+        news_cursor = news_collection.find({
             "$or": [
                 {"title": {"$regex": ticker, "$options": "i"}},
                 {"content": {"$regex": ticker, "$options": "i"}},
                 {"analysis.key_entities": {"$regex": ticker, "$options": "i"}}
             ]
-        }).sort("timestamp", -1).limit(20)
+        }).sort("timestamp", -1).limit(10)
         
-        documents = list(map(serialize_mongo_document, cursor))
+        news_documents = list(map(serialize_mongo_document, news_cursor))
         
-        if not documents:
+        # Get social media sentiment data
+        social_collection = db["social_media_data"]
+        social_cursor = social_collection.find({
+            "ticker": ticker
+        }).sort("timestamp", -1).limit(10)
+        
+        social_documents = list(map(serialize_mongo_document, social_cursor))
+        
+        # Combine news and social media data
+        all_documents = news_documents + social_documents
+        
+        if not all_documents:
             return {
                 "ticker": ticker,
-                "sentiment_score": 0,
+                "sentiment_score": 0.5,
                 "sources": [],
                 "trending_topics": [],
                 "message": "No sentiment data found for this ticker."
             }
         
-        # Aggregate sentiment scores
-        sentiment_scores = [doc.get("analysis", {}).get("sentiment_score", 0) for doc in documents if "analysis" in doc]
-        avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
+        # Extract all posts from social media documents
+        social_posts = []
+        for doc in social_documents:
+            if "posts" in doc:
+                social_posts.extend(doc["posts"])
+        
+        # Combine news documents and social posts
+        combined_documents = news_documents + social_posts
+        
+        # Calculate overall sentiment score
+        sentiment_scores = []
+        
+        # Add news sentiment scores
+        for doc in news_documents:
+            if "analysis" in doc and "sentiment_score" in doc["analysis"]:
+                sentiment_scores.append(doc["analysis"]["sentiment_score"])
+        
+        # Add social media sentiment scores
+        for doc in social_documents:
+            if "overall_sentiment" in doc:
+                # Weight the overall sentiment more heavily
+                sentiment_scores.append(doc["overall_sentiment"])
+                sentiment_scores.append(doc["overall_sentiment"])
+        
+        # Add individual social post sentiment scores
+        for post in social_posts:
+            if "analysis" in post and "sentiment_score" in post["analysis"]:
+                sentiment_scores.append(post["analysis"]["sentiment_score"])
+        
+        # Calculate average sentiment
+        avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0.5
         
         # Extract sources
-        sources = list(set(doc.get("source", "unknown") for doc in documents))
+        sources = set()
+        for doc in news_documents:
+            sources.add(doc.get("source", "unknown"))
+        
+        for doc in social_documents:
+            sources.add(doc.get("source", "unknown"))
         
         # Extract trending topics
         all_topics = []
-        for doc in documents:
+        
+        # From news documents
+        for doc in news_documents:
             if "analysis" in doc and "key_entities" in doc["analysis"]:
                 all_topics.extend(doc["analysis"]["key_entities"])
+        
+        # From social media documents
+        for doc in social_documents:
+            if "trending_topics" in doc:
+                all_topics.extend(doc["trending_topics"])
+        
+        # From individual social posts
+        for post in social_posts:
+            if "analysis" in post and "topics" in post["analysis"]:
+                all_topics.extend(post["analysis"]["topics"])
         
         # Count occurrences of each topic
         topic_counts = {}
         for topic in all_topics:
-            topic_counts[topic] = topic_counts.get(topic, 0) + 1
+            if topic and isinstance(topic, str):
+                topic = topic.strip()
+                if topic:
+                    topic_counts[topic] = topic_counts.get(topic, 0) + 1
         
-        # Sort by count and take top 5
-        trending_topics = sorted(topic_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+        # Sort by count and take top 10
+        trending_topics = sorted(topic_counts.items(), key=lambda x: x[1], reverse=True)[:10]
         trending_topics = [topic for topic, count in trending_topics]
         
         return {
             "ticker": ticker,
             "sentiment_score": avg_sentiment,
-            "sources": sources,
+            "sources": list(sources),
             "trending_topics": trending_topics,
-            "documents": documents
+            "documents": combined_documents
         }
         
     except Exception as e:

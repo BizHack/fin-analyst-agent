@@ -1,19 +1,48 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<!-- Header Banner with Analytics Summary -->
+<div class="summary-box mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h4 class="mb-2"><i class="fas fa-chart-network me-2"></i>Market Intelligence Dashboard</h4>
+            <p class="mb-0 text-muted">Aggregate signals from politics, social media, technical analysis, and fundamentals</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="d-flex justify-content-end align-items-center">
+                <span class="me-3">Last scan: <span class="fw-semibold">{{ market_data.timestamp }}</span></span>
+                <button class="btn btn-sm btn-outline-primary" id="refreshDataBtn">
+                    <i class="fas fa-sync-alt me-1"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
-    <div class="col-md-8">
-        <div class="card mb-4 shadow-sm">
+    <div class="col-lg-8">
+        <!-- Main Analysis Card with Improved Styling -->
+        <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-signal me-2"></i>Market Signals Analysis</h5>
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-signal me-2 text-primary"></i>
+                    <h5 class="mb-0">Market Signals Analysis</h5>
+                </div>
                 <form id="tickerForm" class="d-flex">
-                    <input type="hidden" name="tab_type" value="sentiment">
-                    <input type="text" name="ticker" class="form-control form-control-sm me-2" placeholder="Enter Ticker" value="AAPL" required>
-                    <button type="submit" class="btn btn-primary btn-sm">Analyze</button>
+                    <div class="input-group">
+                        <input type="hidden" name="tab_type" value="sentiment">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="fas fa-search text-primary"></i>
+                        </span>
+                        <input type="text" name="ticker" class="form-control border-start-0" placeholder="Enter Ticker" value="AAPL" required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-bolt me-1"></i> Analyze
+                        </button>
+                    </div>
                 </form>
             </div>
-            <div class="card-body">
-                <!-- Tabs navigation -->
+            <div class="card-body p-0">
+                <!-- Enhanced Tabs Navigation -->
                 <ul class="nav nav-tabs" id="marketTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" data-tab-type="sentiment" id="sentiment-tab" data-bs-toggle="tab" data-bs-target="#sentiment" type="button" role="tab" aria-controls="sentiment" aria-selected="true">
@@ -40,31 +69,60 @@
                 <!-- Tab content -->
                 <div class="tab-content" id="tabContent">
                     <!-- Content will be loaded here via AJAX -->
+                    <div class="d-flex justify-content-center align-items-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <!-- Alerts Section -->
+        <!-- Alerts Section with Enhanced Styling -->
         <div id="alertsContainer">
             <!-- Alerts will be dynamically added here -->
         </div>
     </div>
     
-    <div class="col-md-4">
-        <!-- Market Movements Section -->
-        <div class="card mb-4 shadow-sm hover-card" id="marketMovements">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Market Movements</h5>
+    <div class="col-lg-4">
+        <!-- Quick Access Tools -->
+        <div class="card mb-4">
+            <div class="card-body p-0">
+                <div class="d-flex">
+                    <button class="btn btn-primary flex-grow-1 rounded-0 py-3">
+                        <i class="fas fa-bolt me-2"></i> Quick Scan
+                    </button>
+                    <button class="btn btn-primary flex-grow-1 rounded-0 py-3" id="analyzeEventBtn">
+                        <i class="fas fa-satellite-dish me-2"></i> Analyze Event
+                    </button>
+                    <button class="btn btn-primary flex-grow-1 rounded-0 py-3">
+                        <i class="fas fa-bell me-2"></i> Set Alert
+                    </button>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Enhanced Market Movements Section -->
+        <div class="card mb-4 hover-card" id="marketMovements">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2 text-primary"></i>Market Pulse</h5>
+                <span class="badge bg-primary">Live</span>
             </div>
             <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="fas fa-chart-area me-2"></i>SPY
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle bg-light p-2 me-3 rounded-circle text-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-chart-area"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">S&P 500</h6>
+                                <small class="text-muted">SPY</small>
+                            </div>
                         </div>
-                        <div>
-                            ${{ market_data.spy.price }}
-                            <span class="ms-2 {% if market_data.spy.change_direction == 'up' %}ticker-change-up{% else %}ticker-change-down{% endif %}">
+                        <div class="text-end">
+                            <h6 class="mb-0">${{ market_data.spy.price }}</h6>
+                            <span class="{% if market_data.spy.change_direction == 'up' %}ticker-change-up{% else %}ticker-change-down{% endif %}">
                                 {% if market_data.spy.change_direction == 'up' %}
                                 <i class="fas fa-arrow-up"></i>
                                 {% else %}
@@ -73,14 +131,21 @@
                                 {{ market_data.spy.change }}%
                             </span>
                         </div>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="fab fa-bitcoin me-2"></i>Bitcoin
+                    </div>
+                    
+                    <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle bg-warning p-2 me-3 rounded-circle text-center" style="width: 40px; height: 40px;">
+                                <i class="fab fa-bitcoin"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Bitcoin</h6>
+                                <small class="text-muted">BTC-USD</small>
+                            </div>
                         </div>
-                        <div>
-                            ${{ market_data.bitcoin.price }}
-                            <span class="ms-2 {% if market_data.bitcoin.change_direction == 'up' %}ticker-change-up{% else %}ticker-change-down{% endif %}">
+                        <div class="text-end">
+                            <h6 class="mb-0">${{ market_data.bitcoin.price }}</h6>
+                            <span class="{% if market_data.bitcoin.change_direction == 'up' %}ticker-change-up{% else %}ticker-change-down{% endif %}">
                                 {% if market_data.bitcoin.change_direction == 'up' %}
                                 <i class="fas fa-arrow-up"></i>
                                 {% else %}
@@ -89,14 +154,21 @@
                                 {{ market_data.bitcoin.change }}%
                             </span>
                         </div>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="fas fa-coins me-2"></i>Gold
+                    </div>
+                    
+                    <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle bg-warning p-2 me-3 rounded-circle text-center" style="width: 40px; height: 40px; opacity: 0.8;">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Gold</h6>
+                                <small class="text-muted">GC=F</small>
+                            </div>
                         </div>
-                        <div>
-                            ${{ market_data.gold.price }}
-                            <span class="ms-2 {% if market_data.gold.change_direction == 'up' %}ticker-change-up{% else %}ticker-change-down{% endif %}">
+                        <div class="text-end">
+                            <h6 class="mb-0">${{ market_data.gold.price }}</h6>
+                            <span class="{% if market_data.gold.change_direction == 'up' %}ticker-change-up{% else %}ticker-change-down{% endif %}">
                                 {% if market_data.gold.change_direction == 'up' %}
                                 <i class="fas fa-arrow-up"></i>
                                 {% else %}
@@ -105,54 +177,120 @@
                                 {{ market_data.gold.change }}%
                             </span>
                         </div>
-                    </li>
-                </ul>
-                <div class="small text-muted text-end mt-2">
-                    Last updated: {{ market_data.timestamp }}
-                </div>
-            </div>
-        </div>
-        
-        <!-- Politician Posts Monitor Section -->
-        <div class="card mb-4 shadow-sm hover-card">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-user-tie me-2"></i>Politician Posts Monitor</h5>
-            </div>
-            <div class="card-body">
-                {% for post in politician_posts[:5] %}
-                <div class="politician-post">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <strong>{{ post.politician }}</strong>
-                        <small class="text-muted">{{ post.date }}</small>
                     </div>
-                    <p class="mb-1">{{ post.content }}</p>
-                    <small class="text-muted">Impact: {{ post.impact }}</small>
                 </div>
-                {% endfor %}
             </div>
         </div>
         
-        <!-- Agent Insights Section -->
-        <div class="card mb-4 shadow-sm hover-card">
+        <!-- Enhanced Politician Posts Monitor Section -->
+        <div class="card mb-4 hover-card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-robot me-2"></i>Agent Insights</h5>
-                <button class="btn btn-sm btn-outline-primary" id="analyzeEventBtn">
-                    <i class="fas fa-bolt me-1"></i>Analyze New Event
-                </button>
+                <h5 class="mb-0"><i class="fas fa-user-tie me-2 text-primary"></i>Political Pulse</h5>
+                <a href="#" class="text-decoration-none small">View All <i class="fas fa-chevron-right ms-1 small"></i></a>
             </div>
-            <div class="card-body">
-                {% for insight in agent_insights[:5] %}
-                <div class="insight-{{ insight.priority|lower }} ps-2 py-1 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <strong>{{ insight.agent }}</strong>
-                        <small class="text-muted">{{ insight.timestamp }}</small>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for post in politician_posts[:3] %}
+                    <div class="list-group-item border-0">
+                        <div class="politician-post mb-0">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle me-2 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; font-size: 14px;">
+                                        {{ post.politician[:1] }}
+                                    </div>
+                                    <strong>{{ post.politician }}</strong>
+                                </div>
+                                <small class="text-muted">{{ post.date }}</small>
+                            </div>
+                            <p class="mb-1">{{ post.content }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Impact: {{ post.impact }}</small>
+                                <div class="small">
+                                    <i class="far fa-bookmark text-muted ms-2"></i>
+                                    <i class="far fa-share-square text-muted ms-2"></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <p class="mb-1">{{ insight.insight }}</p>
-                    <small class="text-muted">Tickers: {{ insight.tickers }}</small>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Enhanced Agent Insights Section -->
+        <div class="card mb-4 hover-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-robot me-2 text-primary"></i>AI Insights</h5>
+                <a href="#" class="text-decoration-none small">History <i class="fas fa-chevron-right ms-1 small"></i></a>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for insight in agent_insights[:4] %}
+                    <div class="list-group-item border-0">
+                        <div class="insight-{{ insight.priority|lower }} mb-0">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center">
+                                    {% if insight.agent == 'VolumeSpikeAgent' %}
+                                    <i class="fas fa-chart-line me-2 text-primary"></i>
+                                    {% elif insight.agent == 'PoliticianAgent' %}
+                                    <i class="fas fa-landmark me-2 text-primary"></i>
+                                    {% elif insight.agent == 'NewsAgent' %}
+                                    <i class="fas fa-newspaper me-2 text-primary"></i>
+                                    {% elif insight.agent == 'TrumpAgent' %}
+                                    <i class="fab fa-twitter me-2 text-primary"></i>
+                                    {% elif insight.agent == 'TechnicalAgent' %}
+                                    <i class="fas fa-chart-bar me-2 text-primary"></i>
+                                    {% else %}
+                                    <i class="fas fa-bolt me-2 text-primary"></i>
+                                    {% endif %}
+                                    <strong>{{ insight.agent }}</strong>
+                                </div>
+                                <div>
+                                    {% if insight.priority == 'High' %}
+                                    <span class="badge bg-danger">High</span>
+                                    {% elif insight.priority == 'Medium' %}
+                                    <span class="badge bg-warning">Medium</span>
+                                    {% else %}
+                                    <span class="badge bg-info">Low</span>
+                                    {% endif %}
+                                    <small class="text-muted ms-1">{{ insight.timestamp }}</small>
+                                </div>
+                            </div>
+                            <p class="mb-1">{{ insight.insight }}</p>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-light text-dark me-1">{{ insight.tickers }}</span>
+                                <a href="#" class="ms-auto text-decoration-none small">Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the refresh button
+        const refreshBtn = document.getElementById('refreshDataBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', function() {
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-sync-alt fa-spin me-1"></i> Refreshing...';
+                
+                // Simulate the ticker form submission to refresh data
+                document.getElementById('tickerForm').dispatchEvent(new Event('submit'));
+                
+                // Re-enable after 2 seconds
+                setTimeout(() => {
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-sync-alt me-1"></i> Refresh';
+                }, 2000);
+            });
+        }
+    });
+</script>
 {% endblock %}

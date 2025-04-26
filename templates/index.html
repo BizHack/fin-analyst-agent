@@ -441,76 +441,96 @@
                                 significant resistance at $210. RSI indicates slightly overbought conditions at 72.
                             </p>
                             
-                            <!-- Chart Placeholder -->
-                            <div class="w-full h-64 bg-gray-50 rounded-lg mb-4 flex items-center justify-center">
-                                <div class="text-center">
-                                    <div class="w-full h-64 relative">
-                                        <!-- Mock Chart (Simplified) -->
-                                        <svg class="w-full h-full" viewBox="0 0 400 200" preserveAspectRatio="none">
-                                            <!-- Price Line -->
-                                            <path d="M0,140 C20,120 40,100 60,95 S100,90 120,85 S160,70 180,60 S220,40 240,30 S280,20 300,15 S340,5 400,5" 
-                                                  stroke="#38bdf8" stroke-width="2" fill="none" />
-                                            
-                                            <!-- MA50 Line -->
-                                            <path d="M0,150 C40,130 80,110 120,95 S160,80 200,70 S240,50 280,40 S320,30 400,25" 
-                                                  stroke="#9ca3af" stroke-width="1.5" fill="none" />
-                                            
-                                            <!-- MA200 Line -->
-                                            <path d="M0,170 C40,160 80,150 120,140 S160,130 200,120 S240,110 280,90 S320,80 400,70" 
-                                                  stroke="#22c55e" stroke-width="1.5" fill="none" />
-                                            
-                                            <!-- Volume Bars (Simplified) -->
-                                            <g class="volume-bars">
-                                                <rect x="0" y="190" width="10" height="10" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="20" y="190" width="10" height="20" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="40" y="190" width="10" height="15" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="60" y="190" width="10" height="25" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="80" y="190" width="10" height="30" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="100" y="190" width="10" height="20" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="120" y="190" width="10" height="15" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="140" y="190" width="10" height="10" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="160" y="190" width="10" height="20" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="180" y="190" width="10" height="25" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="200" y="190" width="10" height="40" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="220" y="190" width="10" height="35" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="240" y="190" width="10" height="20" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="260" y="190" width="10" height="15" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="280" y="190" width="10" height="30" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="300" y="190" width="10" height="35" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="320" y="190" width="10" height="40" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="340" y="190" width="10" height="30" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="360" y="190" width="10" height="15" fill="#9ca3af" opacity="0.3"></rect>
-                                                <rect x="380" y="190" width="10" height="20" fill="#9ca3af" opacity="0.3"></rect>
+                            <!-- Improved Chart -->
+                            <div class="w-full h-72 bg-gray-50 rounded-lg mb-4 overflow-hidden border border-gray-100">
+                                <div class="p-4 h-full">
+                                    <div class="w-full h-full relative">
+                                        <!-- Chart Container with proper margins for labels -->
+                                        <svg class="w-full h-full" viewBox="0 0 440 240" preserveAspectRatio="none">
+                                            <!-- Chart Background Grid -->
+                                            <g class="grid-lines" stroke="#e5e7eb" stroke-width="0.5">
+                                                <line x1="40" y1="20" x2="420" y2="20" />
+                                                <line x1="40" y1="70" x2="420" y2="70" />
+                                                <line x1="40" y1="120" x2="420" y2="120" />
+                                                <line x1="40" y1="170" x2="420" y2="170" />
+                                                <line x1="40" y1="20" x2="40" y2="170" />
+                                                <line x1="100" y1="20" x2="100" y2="170" />
+                                                <line x1="160" y1="20" x2="160" y2="170" />
+                                                <line x1="220" y1="20" x2="220" y2="170" />
+                                                <line x1="280" y1="20" x2="280" y2="170" />
+                                                <line x1="340" y1="20" x2="340" y2="170" />
+                                                <line x1="400" y1="20" x2="400" y2="170" />
                                             </g>
                                             
-                                            <!-- Chart Labels -->
-                                            <text x="5" y="20" class="text-xs fill-gray-500">205</text>
-                                            <text x="5" y="70" class="text-xs fill-gray-500">200</text>
-                                            <text x="5" y="120" class="text-xs fill-gray-500">195</text>
-                                            <text x="5" y="170" class="text-xs fill-gray-500">190</text>
+                                            <!-- Price Line with improved path definition -->
+                                            <path d="M40,140 C60,120 80,100 100,95 S140,85 160,75 S200,60 220,50 S260,30 280,25 S320,15 340,10 S380,5 420,5" 
+                                                  stroke="#38bdf8" stroke-width="2.5" fill="none" />
                                             
-                                            <!-- Date Labels -->
-                                            <text x="0" y="195" class="text-xs fill-gray-500">Apr 1</text>
-                                            <text x="60" y="195" class="text-xs fill-gray-500">Apr 5</text>
-                                            <text x="120" y="195" class="text-xs fill-gray-500">Apr 10</text>
-                                            <text x="180" y="195" class="text-xs fill-gray-500">Apr 15</text>
-                                            <text x="240" y="195" class="text-xs fill-gray-500">Apr 20</text>
-                                            <text x="300" y="195" class="text-xs fill-gray-500">Apr 25</text>
+                                            <!-- MA50 Line with improved path definition -->
+                                            <path d="M40,150 C80,130 120,110 160,95 S200,80 240,70 S280,50 320,40 S360,30 420,25" 
+                                                  stroke="#9ca3af" stroke-width="1.5" fill="none" stroke-dasharray="4" />
+                                            
+                                            <!-- MA200 Line with improved path definition -->
+                                            <path d="M40,170 C80,160 120,150 160,140 S200,130 240,120 S280,110 320,90 S360,80 420,70" 
+                                                  stroke="#22c55e" stroke-width="1.5" fill="none" />
+                                            
+                                            <!-- Volume Bars (Improved) -->
+                                            <g class="volume-bars" transform="translate(40, 0)">
+                                                <rect x="0" y="190" width="8" height="10" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="20" y="180" width="8" height="20" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="40" y="185" width="8" height="15" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="60" y="175" width="8" height="25" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="80" y="170" width="8" height="30" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="100" y="180" width="8" height="20" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="120" y="185" width="8" height="15" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="140" y="190" width="8" height="10" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="160" y="180" width="8" height="20" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="180" y="175" width="8" height="25" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="200" y="160" width="8" height="40" fill="#38bdf8" opacity="0.5"></rect>
+                                                <rect x="220" y="165" width="8" height="35" fill="#38bdf8" opacity="0.5"></rect>
+                                                <rect x="240" y="180" width="8" height="20" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="260" y="185" width="8" height="15" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="280" y="170" width="8" height="30" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="300" y="165" width="8" height="35" fill="#38bdf8" opacity="0.5"></rect>
+                                                <rect x="320" y="160" width="8" height="40" fill="#38bdf8" opacity="0.5"></rect>
+                                                <rect x="340" y="170" width="8" height="30" fill="#9ca3af" opacity="0.4"></rect>
+                                                <rect x="360" y="185" width="8" height="15" fill="#9ca3af" opacity="0.4"></rect>
+                                            </g>
+                                            
+                                            <!-- Price Labels - Better positioned -->
+                                            <g class="price-labels" fill="#000000" font-size="11">
+                                                <text x="10" y="25" text-anchor="start" font-weight="500">$205</text>
+                                                <text x="10" y="75" text-anchor="start">$200</text>
+                                                <text x="10" y="125" text-anchor="start">$195</text>
+                                                <text x="10" y="175" text-anchor="start">$190</text>
+                                            </g>
+                                            
+                                            <!-- Date Labels - Better positioned and spaced -->
+                                            <g class="date-labels" fill="#000000" font-size="10">
+                                                <text x="40" y="215" text-anchor="middle">Apr 1</text>
+                                                <text x="100" y="215" text-anchor="middle">Apr 5</text>
+                                                <text x="160" y="215" text-anchor="middle">Apr 10</text>
+                                                <text x="220" y="215" text-anchor="middle">Apr 15</text>
+                                                <text x="280" y="215" text-anchor="middle">Apr 20</text>
+                                                <text x="340" y="215" text-anchor="middle">Apr 25</text>
+                                                <text x="400" y="215" text-anchor="middle">Apr 30</text>
+                                            </g>
                                         </svg>
                                         
-                                        <!-- Legend -->
-                                        <div class="absolute bottom-0 right-0 bg-white bg-opacity-60 p-1 text-xs">
-                                            <div class="flex items-center">
-                                                <div class="w-3 h-0.5 bg-blue-400 mr-1"></div>
-                                                <span class="text-gray-700">price</span>
+                                        <!-- Improved Legend -->
+                                        <div class="absolute top-2 right-2 bg-white bg-opacity-80 p-2 rounded shadow-sm text-xs border border-gray-100">
+                                            <div class="font-medium mb-1 text-black">AAPL Price Chart</div>
+                                            <div class="flex items-center mb-1">
+                                                <div class="w-4 h-1 bg-blue-400 mr-2"></div>
+                                                <span class="text-black">Price</span>
+                                            </div>
+                                            <div class="flex items-center mb-1">
+                                                <div class="w-4 h-1 bg-gray-400 mr-2" style="border-top: 1px dashed #9ca3af;"></div>
+                                                <span class="text-black">50-day MA</span>
                                             </div>
                                             <div class="flex items-center">
-                                                <div class="w-3 h-0.5 bg-gray-400 mr-1"></div>
-                                                <span class="text-gray-700">ma50</span>
-                                            </div>
-                                            <div class="flex items-center">
-                                                <div class="w-3 h-0.5 bg-green-500 mr-1"></div>
-                                                <span class="text-gray-700">ma200</span>
+                                                <div class="w-4 h-1 bg-green-500 mr-2"></div>
+                                                <span class="text-black">200-day MA</span>
                                             </div>
                                         </div>
                                     </div>
@@ -520,8 +540,8 @@
                         
                         <!-- Technical Patterns -->
                         <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Technical Patterns</h3>
-                            <p class="text-gray-500 text-sm mb-6">Detected chart patterns and signals</p>
+                            <h3 class="text-xl font-semibold text-black mb-2">Technical Patterns</h3>
+                            <p class="text-black text-sm mb-6">Detected chart patterns and signals</p>
                             
                             <div class="space-y-4">
                                 <!-- Pattern 1 -->
@@ -530,10 +550,10 @@
                                         <p class="font-medium">Recent Breakout</p>
                                         <p class="flex items-center">
                                             <span class="text-xs mr-2 bg-green-100 text-green-800 px-2 py-0.5 rounded">High</span>
-                                            <span class="text-sm text-gray-500">Status: Confirmed</span>
+                                            <span class="text-sm text-black">Status: Confirmed</span>
                                         </p>
                                     </div>
-                                    <div class="text-sm text-gray-700">
+                                    <div class="text-sm text-black">
                                         Target: $215
                                     </div>
                                 </div>
@@ -544,10 +564,10 @@
                                         <p class="font-medium">Cup and Handle</p>
                                         <p class="flex items-center">
                                             <span class="text-xs mr-2 bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">Medium</span>
-                                            <span class="text-sm text-gray-500">Status: Forming</span>
+                                            <span class="text-sm text-black">Status: Forming</span>
                                         </p>
                                     </div>
-                                    <div class="text-sm text-gray-700">
+                                    <div class="text-sm text-black">
                                         Target: $225
                                     </div>
                                 </div>
@@ -558,10 +578,10 @@
                                         <p class="font-medium">Support Level</p>
                                         <p class="flex items-center">
                                             <span class="text-xs mr-2 bg-green-100 text-green-800 px-2 py-0.5 rounded">High</span>
-                                            <span class="text-sm text-gray-500">Status: Holding</span>
+                                            <span class="text-sm text-black">Status: Holding</span>
                                         </p>
                                     </div>
-                                    <div class="text-sm text-gray-700">
+                                    <div class="text-sm text-black">
                                         Target: $195
                                     </div>
                                 </div>
@@ -572,7 +592,7 @@
                                         <p class="font-medium">Resistance Level</p>
                                         <p class="flex items-center">
                                             <span class="text-xs mr-2 bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">Medium</span>
-                                            <span class="text-sm text-gray-500">Status: Testing</span>
+                                            <span class="text-sm text-black">Status: Testing</span>
                                         </p>
                                     </div>
                                     <div class="text-sm text-gray-700">

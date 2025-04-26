@@ -1,0 +1,31 @@
+Create a Python app that does the following:
+
+- Build a simple Flask web server with a modern, clean-looking UI (use Bootstrap or similar if needed).
+- Name the homepage "TrainingUp.ai - Market Signal Intelligence".
+- Homepage should have 4 main tabs:
+  1. **Sentiment**: Analyze recent social media posts from Reddit, Twitter, Truth Social. Show top 5 posts related to a selected ticker. Display a short paragraph summary of market sentiment for that ticker.
+  2. **Politician Trades**: Monitor latest U.S. politician stock trades. Show the last 5 trades and provide a short paragraph highlight for a selected ticker.
+  3. **Technical Analysis**: Analyze price action and pattern detection for a selected ticker. Display a paragraph summary (e.g., support/resistance or breakout pattern detection).
+  4. **Fundamentals**: Analyze earnings call results or key financials of a selected ticker. Summarize a paragraph of highlights for that ticker.
+
+- Also, on the homepage, outside of tabs, create three quick sections:
+  - "Politician Posts Monitor" (shows last 5 analyzed political posts or trades)
+  - "Market Movements" (shows latest SPY, Bitcoin, Gold prices)
+  - "Agent Insights" (short list of real-time alerts from agents)
+
+- Add a button "Analyze New Event" that simulates a new social post or market move and triggers analysis.
+
+- Organize the project into these folders:
+  - /agents (for different mini agents like TrumpPostAgent, VolumeSpikeAgent, NewsAgent)
+  - /data (temporary datasets and saved analysis)
+  - /models (future ML models for pattern prediction)
+  - /static (CSS, JS if needed)
+  - /templates (Flask HTML templates)
+
+- Install and use necessary packages: flask, yfinance, requests.
+
+- Create a placeholder Python file in /agents called trump_agent.py.
+
+- Design the UI to be attractive and easy to navigate, using Bootstrap cards, tabs, and clean layouts.
+
+The purpose of the project is to track political, social media, technical, and fundamental signals and their impact on financial markets, and to display real-time insights.

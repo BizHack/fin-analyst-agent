@@ -24,14 +24,21 @@ def log_anthropic_api_usage(operation, ticker, start_time=None, success=None, er
         success (bool, optional): Whether the operation was successful
         error (str, optional): Error message if the operation failed
     """
+    # Always print to stdout for immediate visibility
     if start_time and success is not None:
         duration = round((time.time() - start_time) * 1000)  # Convert to milliseconds
         if success:
-            logger.info(f"ANTHROPIC API: Successfully completed {operation} for {ticker} in {duration}ms")
+            message = f"ANTHROPIC API: Successfully completed {operation} for {ticker} in {duration}ms"
+            print(f"\033[92m{message}\033[0m")  # Green text
+            logger.info(message)
         else:
-            logger.error(f"ANTHROPIC API: Failed {operation} for {ticker} after {duration}ms: {error}")
+            message = f"ANTHROPIC API: Failed {operation} for {ticker} after {duration}ms: {error}"
+            print(f"\033[91m{message}\033[0m")  # Red text
+            logger.error(message)
     else:
-        logger.info(f"ANTHROPIC API: Starting {operation} for {ticker}")
+        message = f"ANTHROPIC API: Starting {operation} for {ticker} at {time.strftime('%H:%M:%S')}"
+        print(f"\033[94m{message}\033[0m")  # Blue text
+        logger.info(message)
         return time.time()  # Return start time for later use
 
 # Environment variables for API connections

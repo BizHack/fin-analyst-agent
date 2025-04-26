@@ -16,9 +16,30 @@ BACKEND_API_URL = os.environ.get("BACKEND_API_URL", "http://localhost:8888")
 import models
 from models import User, Watchlist, WatchlistStock, Alert, StockFundamental, StockSentiment, PoliticianTrade, TechnicalIndicator, AnalystRating
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
+# Configure logging with more detailed format
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 logger = logging.getLogger(__name__)
+
+# Set specific loggers to higher levels to reduce noise
+logging.getLogger('urllib3').setLevel(logging.WARNING)
+logging.getLogger('werkzeug').setLevel(logging.WARNING)
+logging.getLogger('peewee').setLevel(logging.WARNING)
+logging.getLogger('yfinance').setLevel(logging.WARNING)
+
+# Ensure our application logs are visible
+logging.getLogger('agents').setLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)
+
+# Add a handler that prints to stdout
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('\033[1;36m%(asctime)s - %(name)s - %(levelname)s:\033[0m %(message)s', datefmt='%H:%M:%S')
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
 
 # Create and configure the app
 app = Flask(__name__)

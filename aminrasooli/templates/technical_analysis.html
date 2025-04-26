@@ -1,0 +1,142 @@
+<div class="mt-4">
+    <div class="summary-box">
+        <h5><i class="fas fa-chart-line me-2"></i>Technical Analysis for {{ ticker }}</h5>
+        <p>{{ summary }}</p>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">Price Levels</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Current Price:</span>
+                        <strong>${{ data.current_price }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>20-Day MA:</span>
+                        <strong>${{ data.ma20 }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Support:</span>
+                        <strong>${{ data.support }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Resistance:</span>
+                        <strong>${{ data.resistance }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Trend:</span>
+                        <strong>
+                            {% if 'bullish' in data.trend %}
+                            <span class="text-success">{{ data.trend }}</span>
+                            {% elif 'bearish' in data.trend %}
+                            <span class="text-danger">{{ data.trend }}</span>
+                            {% else %}
+                            <span class="text-warning">{{ data.trend }}</span>
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">Volume Analysis</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Recent Volume:</span>
+                        <strong>{{ data.volume }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Average Volume:</span>
+                        <strong>{{ data.avg_volume }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Volume Ratio:</span>
+                        <strong>
+                            {{ data.volume_ratio }}
+                            {% if data.volume_ratio > 1.5 %}
+                            <span class="text-success"><i class="fas fa-arrow-up"></i></span>
+                            {% elif data.volume_ratio < 0.7 %}
+                            <span class="text-danger"><i class="fas fa-arrow-down"></i></span>
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <div class="mt-3">
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-primary" role="progressbar" 
+                                 style="width: {{ (data.volume_ratio * 50)|min(100) }}%;" 
+                                 aria-valuenow="{{ data.volume_ratio }}" aria-valuemin="0" aria-valuemax="2">
+                                {{ data.volume_status }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mt-2">
+        <div class="card-header">
+            <h6 class="mb-0">Price Chart (Last 10 Days)</h6>
+        </div>
+        <div class="card-body">
+            <canvas id="priceChart" height="250"></canvas>
+        </div>
+    </div>
+    
+    <div class="alert alert-info mt-4">
+        <i class="fas fa-info-circle me-2"></i>
+        Technical analysis examines price action and volume patterns to identify potential trading opportunities. The system analyzes support/resistance levels, moving averages, and volume trends to generate market signals.
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set up chart data
+        const dates = {{ data.historical_dates|tojson }};
+        const prices = {{ data.historical_prices|tojson }};
+        
+        // Create price chart
+        const ctx = document.getElementById('priceChart').getContext('2d');
+        const priceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: '{{ ticker }} Price',
+                    data: prices,
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `$${context.raw.toFixed(2)}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>

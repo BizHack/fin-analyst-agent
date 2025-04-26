@@ -1,0 +1,111 @@
+<div class="mt-4">
+    <div class="summary-box">
+        <h5><i class="fas fa-file-invoice-dollar me-2"></i>Fundamental Analysis for {{ ticker }}</h5>
+        <p>{{ summary }}</p>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">Company Overview</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Company:</span>
+                        <strong>{{ data.company_name }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Sector:</span>
+                        <strong>{{ data.sector }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Industry:</span>
+                        <strong>{{ data.industry }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Market Cap:</span>
+                        <strong>${{ data.market_cap }}B</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">Key Metrics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>P/E Ratio:</span>
+                        <strong>{{ data.pe_ratio }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Dividend Yield:</span>
+                        <strong>{{ data.dividend_yield }}%</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>52-Week High:</span>
+                        <strong>${{ data.52w_high }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>52-Week Low:</span>
+                        <strong>${{ data.52w_low }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mt-2">
+        <div class="card-header">
+            <h6 class="mb-0">Earnings Overview</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Revenue:</span>
+                        <strong>${{ data.revenue }}B</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>EPS:</span>
+                        <strong>{{ data.eps }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>EPS Status:</span>
+                        <strong>
+                            {% if data.eps_status == 'beating' %}
+                            <span class="text-success">Beating Expectations</span>
+                            {% elif data.eps_status == 'meeting' %}
+                            <span class="text-warning">Meeting Expectations</span>
+                            {% else %}
+                            <span class="text-danger">Missing Expectations</span>
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Guidance:</span>
+                        <strong>
+                            {% if data.guidance == 'positive' %}
+                            <span class="text-success">Positive</span>
+                            {% elif data.guidance == 'neutral' %}
+                            <span class="text-warning">Neutral</span>
+                            {% else %}
+                            <span class="text-danger">Cautious</span>
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="alert alert-info mt-4">
+        <i class="fas fa-info-circle me-2"></i>
+        Fundamental analysis examines a company's financial statements, market position, and growth prospects. The system analyzes earnings reports, guidance, and management commentary to identify potential long-term investment opportunities.
+    </div>
+</div>

@@ -1,0 +1,46 @@
+<div class="mt-4">
+    <div class="summary-box">
+        <h5><i class="fas fa-landmark me-2"></i>Politician Trade Analysis for {{ ticker }}</h5>
+        <p>{{ summary }}</p>
+    </div>
+    
+    <h6 class="mt-4 mb-3">Recent Politician Trades</h6>
+    
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Politician</th>
+                    <th>Position</th>
+                    <th>Transaction</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Disclosure Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trade in trades %}
+                <tr>
+                    <td>{{ trade.politician }}</td>
+                    <td><small>{{ trade.position }}</small></td>
+                    <td>
+                        {% if trade.transaction_type == 'Purchase' %}
+                        <span class="badge bg-success">Purchase</span>
+                        {% else %}
+                        <span class="badge bg-danger">Sale</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ trade.amount }}</td>
+                    <td>{{ trade.date }}</td>
+                    <td>{{ trade.disclosure_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="alert alert-info mt-4">
+        <i class="fas fa-info-circle me-2"></i>
+        Politician trading data is sourced from regulatory filings and public disclosures. The system tracks trading patterns from elected officials to identify potential market signals. This information is reported with a delay based on disclosure requirements.
+    </div>
+</div>

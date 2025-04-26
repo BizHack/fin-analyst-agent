@@ -13,7 +13,7 @@ from agents.trump_agent import analyze_trump_posts
 
 logger = logging.getLogger(__name__)
 
-def log_anthropic_api_usage(operation, ticker, start_time=None, success=None, error=None):
+def log_anthropic_api_usage(operation, ticker, start_time=None, success=None, error=None, input_tokens=None, output_tokens=None):
     """
     Log information about Anthropic API usage for sentiment analysis
     
@@ -23,12 +23,21 @@ def log_anthropic_api_usage(operation, ticker, start_time=None, success=None, er
         start_time (float, optional): The start time of the operation (as returned by time.time())
         success (bool, optional): Whether the operation was successful
         error (str, optional): Error message if the operation failed
+        input_tokens (int, optional): Number of input tokens used in the API call
+        output_tokens (int, optional): Number of output tokens used in the API call
     """
     # Always print to stdout for immediate visibility
     if start_time and success is not None:
         duration = round((time.time() - start_time) * 1000)  # Convert to milliseconds
+        
+        # Format token usage information if available
+        token_info = ""
+        if input_tokens is not None and output_tokens is not None:
+            total_tokens = input_tokens + output_tokens
+            token_info = f" [Tokens: {input_tokens} in + {output_tokens} out = {total_tokens} total]"
+        
         if success:
-            message = f"ANTHROPIC API: Successfully completed {operation} for {ticker} in {duration}ms"
+            message = f"ANTHROPIC API: Successfully completed {operation} for {ticker} in {duration}ms{token_info}"
             print(f"\033[92m{message}\033[0m")  # Green text
             logger.info(message)
         else:

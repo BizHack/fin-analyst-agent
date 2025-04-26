@@ -269,7 +269,7 @@ def analyze_ticker():
                 
                 # Get additional data for display
                 sources = sentiment_data.get("sources", [])
-                last_updated = sentiment_data.get("last_updated", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                last_updated = sentiment_data.get("last_updated", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                 
                 return render_template('sentiment.html', 
                                     ticker=ticker, 
@@ -338,7 +338,7 @@ def analyze_ticker():
                 sentiment_summary = f"Based on recent analysis from {sources}, {ticker} shows {sentiment_type} sentiment with trending discussions about {trending_topics}."
                 
                 # Get last_updated from social data
-                last_updated = social_data.get("last_updated", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                last_updated = social_data.get("last_updated", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                 sources_list = social_data.get("sources", ["Reddit", "Truth Social"])
                 
                 return render_template('sentiment.html', 

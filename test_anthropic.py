@@ -141,9 +141,22 @@ def analyze_sentiment_with_anthropic(ticker, content):
             else:
                 # If no JSON found, use the full text
                 result = json.loads(result_text)
-                
-            log_anthropic_api_usage("sentiment_analysis", ticker, start_time, True)
+            
+            # Extract token usage from the response
+            input_tokens = response.usage.input_tokens
+            output_tokens = response.usage.output_tokens
+            
+            # Log success with token usage
+            log_anthropic_api_usage(
+                "sentiment_analysis", 
+                ticker, 
+                start_time, 
+                True, 
+                input_tokens=input_tokens,
+                output_tokens=output_tokens
+            )
             return result
+            
         except json.JSONDecodeError as e:
             log_anthropic_api_usage("sentiment_analysis", ticker, start_time, False, f"JSON parsing error: {e}")
             logger.error(f"Error parsing JSON response: {e}")

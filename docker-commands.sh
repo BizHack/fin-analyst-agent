@@ -1,63 +1,86 @@
 #!/bin/bash
 
-# Make this script executable with: chmod +x docker-commands.sh
+# This script contains helpful commands for managing the Docker containers
 
-# Function to display help information
+# Function to display help message
 show_help() {
-  echo "Usage: ./docker-commands.sh [COMMAND]"
-  echo ""
-  echo "Commands:"
-  echo "  build       Build the Docker images"
-  echo "  up          Start the application with Docker Compose"
-  echo "  down        Stop the application and remove containers"
-  echo "  restart     Restart the application"
-  echo "  logs        Show logs from the containers"
-  echo "  db-shell    Access the PostgreSQL database shell"
-  echo "  app-shell   Access the application container shell"
-  echo "  clean       Remove all containers, images, and volumes"
-  echo "  help        Show this help message"
+    echo "Usage: ./docker-commands.sh [command]"
+    echo ""
+    echo "Commands:"
+    echo "  up              Start all containers in detached mode"
+    echo "  down            Stop and remove all containers"
+    echo "  restart         Restart all containers"
+    echo "  logs [service]  View logs for a specific service or all services"
+    echo "  ps              List all running containers"
+    echo "  exec [service]  Execute a bash shell in a container"
+    echo "  build           Rebuild all containers"
+    echo "  clean           Remove all containers, images, and volumes"
+    echo "  help            Display this help message"
+    echo ""
+    echo "Examples:"
+    echo "  ./docker-commands.sh up"
+    echo "  ./docker-commands.sh logs app"
+    echo "  ./docker-commands.sh exec mcp-server"
 }
 
-# Process commands
-case "$1" in
-  build)
-    docker-compose build
-    ;;
-    
-  up)
-    docker-compose up -d
-    echo "Application started on http://localhost:5000"
-    ;;
-    
-  down)
-    docker-compose down
-    echo "Application stopped"
-    ;;
-    
-  restart)
-    docker-compose down
-    docker-compose up -d
-    echo "Application restarted on http://localhost:5000"
-    ;;
-    
-  logs)
-    docker-compose logs -f
-    ;;
-    
-  db-shell)
-    docker-compose exec db psql -U postgres -d finhackers
-    ;;
-    
-  app-shell)
-    docker-compose exec web bash
-    ;;
-    
-  clean)
-    docker-compose down -v --rmi all
-    echo "All containers, images, and volumes removed"
-    ;;
-    
-  help|*)
+# Check if the script is run with a command
+if [ $# -lt 1 ]; then
     show_help
-    ;;
+    exit 1
+fi
+
+# Process the command
+case "$1" in
+    up)
+        echo "Starting all containers in detached mode..."
+        docker-compose up -d
+        ;;
+    down)
+        echo "Stopping and removing all containers..."
+        docker-compose down
+        ;;
+    restart)
+        echo "Restarting all containers..."
+        docker-compose restart
+        ;;
+    logs)
+        if [ $# -gt 1 ]; then
+            echo "Viewing logs for $2..."
+            docker-compose logs -f $2
+        else
+            echo "Viewing logs for all services..."
+            docker-compose logs -f
+        fi
+        ;;
+    ps)
+        echo "Listing all running containers..."
+        docker-compose ps
+        ;;
+    exec)
+        if [ $# -gt 1 ]; then
+            echo "Executing bash shell in $2..."
+            docker-compose exec $2 bash
+        else
+            echo "Please specify a service name"
+            echo "Usage: ./docker-commands.sh exec [service]"
+            exit 1
+        fi
+        ;;
+    build)
+        echo "Rebuilding all containers..."
+        docker-compose build
+        ;;
+    clean)
+        echo "Removing all containers, images, and volumes..."
+        docker-compose down -v
+        docker system prune -af
+        ;;
+    help)
+        show_help
+        ;;
+    *)
+        echo "Unknown command: $1"
+        show_help
+        exit 1
+        ;;
 esac

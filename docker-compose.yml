@@ -1,169 +1,119 @@
 version: '3.8'
 
 services:
-  # Original Flask Web Application
-  web:
-    build: .
+  # Main Flask application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/finhackers
-      - SESSION_SECRET=${SESSION_SECRET:-default_session_secret_change_in_production}
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-      - ANTROPIC_API_KEY=${ANTROPIC_API_KEY:-}
-      - PGUSER=postgres
-      - PGPASSWORD=postgres
-      - PGDATABASE=finhackers
-      - PGHOST=db
-      - PGPORT=5432
+      - DATABASE_URL=postgresql://${PGUSER}:${PGPASSWORD}@postgres:5432/${PGDATABASE}
+      - MONGODB_URI=mongodb://mongoadmin:mongopass@mongodb:27017
+      - VECTORDB_URL=http://vectordb:8080
+      - MCP_SERVER_URL=http://mcp-server:8000
+      - MCP_CLIENT_URL=http://mcp-client:8001
+      - BACKEND_API_URL=http://backend-api:8888
+    volumes:
+      - .:/app
     depends_on:
-      - db
+      - postgres
+      - mongodb
+      - vectordb
+      - mcp-server
+      - mcp-client
       - backend-api
-    volumes:
-      - ./:/app
-    networks:
-      - finhackers-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    restart: always
 
-  # PostgreSQL Database
-  db:
-    image: postgres:14
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=finhackers
-    ports:
-      - "5432:5432"
-    networks:
-      - finhackers-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-  # MongoDB for processed data storage
-  mongodb:
-    image: mongo:6
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
-      - MONGO_INITDB_ROOT_PASSWORD=mongopass
-    networks:
-      - finhackers-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-  
-  # Data Gathering Layer (MCP Server)
+  # MCP Server - Data Gathering
   mcp-server:
     build:
       context: ./services/mcp-server
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    environment:
+      - MONGODB_URI=mongodb://mongoadmin:mongopass@mongodb:27017
     volumes:
       - ./services/mcp-server:/app
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-      - ANTROPIC_API_KEY=${ANTROPIC_API_KEY:-}
-    networks:
-      - finhackers-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    depends_on:
+      - mongodb
+    restart: always
 
-  # Processing Layer (MCP Client + VectorDB + Langraph)
+  # MCP Client - Data Processing
   mcp-client:
     build:
       context: ./services/mcp-client
       dockerfile: Dockerfile
-    depends_on:
-      - mcp-server
-      - mongodb
-      - vectordb
+    ports:
+      - "8001:8001"
+    environment:
+      - MONGODB_URI=mongodb://mongoadmin:mongopass@mongodb:27017
+      - VECTORDB_URL=http://vectordb:8080
+      - MCP_SERVER_URL=http://mcp-server:8000
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     volumes:
       - ./services/mcp-client:/app
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-      - ANTROPIC_API_KEY=${ANTROPIC_API_KEY:-}
-      - MCP_SERVER_URL=http://mcp-server:8000
-      - VECTORDB_URL=http://vectordb:8080
-      - MONGODB_URI=mongodb://mongoadmin:mongopass@mongodb:27017
-    networks:
-      - finhackers-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-  
-  # VectorDB (ChromaDB)
-  vectordb:
-    image: ghcr.io/chroma-core/chroma:latest
-    ports:
-      - "8080:8000"
-    volumes:
-      - vectordb_data:/chroma/chroma
-    networks:
-      - finhackers-network
-    restart: unless-stopped
-  
-  # FastAPI Backend
+    depends_on:
+      - mongodb
+      - vectordb
+      - mcp-server
+    restart: always
+
+  # Backend API - API Gateway
   backend-api:
     build:
       context: ./services/backend-api
       dockerfile: Dockerfile
     ports:
       - "8888:8888"
-    depends_on:
-      - mongodb
-      - vectordb
     environment:
       - MONGODB_URI=mongodb://mongoadmin:mongopass@mongodb:27017
       - VECTORDB_URL=http://vectordb:8080
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-      - ANTROPIC_API_KEY=${ANTROPIC_API_KEY:-}
+      - SECRET_KEY=${SECRET_KEY:-placeholder_secret_key_change_in_production}
     volumes:
       - ./services/backend-api:/app
-    networks:
-      - finhackers-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8888/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    depends_on:
+      - mongodb
+      - vectordb
+    restart: always
 
-networks:
-  finhackers-network:
-    driver: bridge
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${PGUSER}
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+      - POSTGRES_DB=${PGDATABASE}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  # MongoDB for document storage
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+      - MONGO_INITDB_ROOT_PASSWORD=mongopass
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+
+  # ChromaDB for vector embeddings
+  vectordb:
+    image: chromadb/chroma:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - chroma_data:/chroma/chroma
+    restart: always
 
 volumes:
   postgres_data:
   mongodb_data:
-  vectordb_data:
+  chroma_data:

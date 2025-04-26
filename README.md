@@ -1,139 +1,139 @@
-# finHackers Platform
+# FinHackers Market Intelligence Platform
 
-An advanced AI-powered market intelligence platform that leverages intelligent data processing to provide comprehensive financial insights across multiple data sources.
+FinHackers is an advanced AI-powered market intelligence platform that leverages intelligent data processing to provide comprehensive financial insights across multiple data sources.
 
-## Features
+## Architecture
 
-- Real-time market trend tracking and analysis
-- Multi-source data collection and sentiment analysis
-- Advanced visualization of financial data
-- Politician trade tracking and analysis
-- Social media sentiment analysis
-- Fundamental financial data analysis
-- Technical indicator analysis
-- User authentication and watchlist management
-- Alerts for price movements and volume spikes
+The platform is built with a microservices architecture, consisting of several components:
+
+1. **Main Flask Application** - The web interface and API endpoint for the frontend
+2. **MCP Server (Data Gathering Layer)** - Responsible for fetching data from various sources
+3. **MCP Client (Processing Layer)** - Processes the gathered data using AI
+4. **Backend API** - Acts as a gateway between the processed data and the frontend
+5. **PostgreSQL Database** - Stores user data, watchlists, and alerts
+6. **MongoDB** - Stores processed documents and analysis results
+7. **ChromaDB** - Vector database for semantic search and similarity queries
+
+## System Architecture
+
+```
+┌────────────────┐     ┌────────────────┐     ┌────────────────┐
+│                │     │                │     │                │
+│  MCP Server    │────▶│  MCP Client    │────▶│  MongoDB       │
+│  (Data Gather) │     │  (Processing)  │     │  (Documents)   │
+│                │     │                │     │                │
+└────────────────┘     └────────────────┘     └────────────────┘
+        │                      │                      │
+        │                      │                      │
+        │                      ▼                      │
+        │              ┌────────────────┐             │
+        │              │                │             │
+        │              │  ChromaDB      │             │
+        │              │  (Vectors)     │             │
+        │              │                │             │
+        │              └────────────────┘             │
+        │                      │                      │
+        │                      │                      │
+        ▼                      ▼                      ▼
+┌────────────────┐     ┌────────────────┐     ┌────────────────┐
+│                │     │                │     │                │
+│  Backend API   │◀───▶│  Flask App     │◀───▶│  PostgreSQL    │
+│  (Gateway)     │     │  (Frontend)    │     │  (User Data)   │
+│                │     │                │     │                │
+└────────────────┘     └────────────────┘     └────────────────┘
+                              │
+                              │
+                              ▼
+                      ┌────────────────┐
+                      │                │
+                      │    Browser     │
+                      │                │
+                      └────────────────┘
+```
+
+## Key Features
+
+- **Multi-Source Data Collection**: Aggregates data from social media, news, politician trades, and market data
+- **AI-Powered Analysis**: Processes data using AI models to extract insights
+- **Comprehensive Financial Insights**: Technical analysis, fundamental data, sentiment analysis, and more
+- **Real-Time Data Processing**: Processes data in real-time for up-to-date insights
+- **User Management**: Create watchlists, set alerts, and track favorite stocks
 
 ## Tech Stack
 
-- **Backend**: Python with Flask web framework
-- **Database**: PostgreSQL for data persistence
-- **Data Retrieval**: yfinance, requests, trafilatura
-- **AI Integration**: OpenAI API
-- **Frontend**: Modern responsive UI with Tailwind CSS
+- **Backend**: Python (Flask, FastAPI)
+- **Frontend**: HTML, CSS, JavaScript (Bootstrap)
+- **Databases**: PostgreSQL, MongoDB, ChromaDB
+- **AI Processing**: Anthropic Claude, LangGraph, LangChain
+- **Containerization**: Docker, Docker Compose
 
-## Dockerized Deployment
+## Getting Started
 
 ### Prerequisites
 
-- Docker
-- Docker Compose
-- Git
+- Docker and Docker Compose
+- Anthropic API key (for AI processing)
 
-### Setup and Deployment
+### Environment Setup
 
-1. **Clone the repository**
+1. Clone the repository
+2. Copy `.env.example` to `.env` and fill in the required values
+3. Make the helper script executable: `chmod +x docker-commands.sh`
 
-   ```bash
-   git clone https://github.com/yourusername/finhackers.git
-   cd finhackers
-   ```
+### Running the Application
 
-2. **Configure environment variables**
+Start all services:
 
-   Copy the example environment file and update it with your own settings:
+```bash
+./docker-commands.sh up
+```
 
-   ```bash
-   cp .env.example .env
-   ```
+The application will be available at `http://localhost:5000`
 
-   Then edit the `.env` file to include your OpenAI API key and any other environment variables.
+### Helper Commands
 
-3. **Build and start the application**
+The `docker-commands.sh` script provides helpful commands for managing the containers:
 
-   ```bash
-   # Make the docker commands script executable
-   chmod +x docker-commands.sh
-   
-   # Build the Docker images
-   ./docker-commands.sh build
-   
-   # Start the application
-   ./docker-commands.sh up
-   ```
+```bash
+# Start all containers in detached mode
+./docker-commands.sh up
 
-   The application will be available at http://localhost:5000
+# Stop and remove all containers
+./docker-commands.sh down
 
-4. **Verify it's working**
+# Restart all containers
+./docker-commands.sh restart
 
-   Check the health of the application:
+# View logs for a specific service
+./docker-commands.sh logs app
 
-   ```bash
-   curl http://localhost:5000/health
-   ```
+# Execute a bash shell in a container
+./docker-commands.sh exec mcp-server
 
-5. **View logs**
+# Rebuild all containers
+./docker-commands.sh build
 
-   ```bash
-   ./docker-commands.sh logs
-   ```
+# Remove all containers, images, and volumes
+./docker-commands.sh clean
+```
 
-6. **Stop the application**
+## API Endpoints
 
-   ```bash
-   ./docker-commands.sh down
-   ```
+The Backend API provides several endpoints for accessing financial data:
 
-### Docker Command Helper
-
-The `docker-commands.sh` script provides convenient shortcuts for common Docker operations:
-
-- `./docker-commands.sh build` - Build the Docker images
-- `./docker-commands.sh up` - Start the application
-- `./docker-commands.sh down` - Stop the application
-- `./docker-commands.sh restart` - Restart the application
-- `./docker-commands.sh logs` - Show logs from the containers
-- `./docker-commands.sh db-shell` - Access the PostgreSQL database shell
-- `./docker-commands.sh app-shell` - Access the application container shell
-- `./docker-commands.sh clean` - Remove all containers, images, and volumes
-- `./docker-commands.sh help` - Show help message
-
-## Development Setup (Non-Docker)
-
-1. Create and activate a virtual environment:
-
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   pip install email-validator flask flask-sqlalchemy gunicorn openai psycopg2-binary requests trafilatura yfinance
-   ```
-
-3. Set up environment variables:
-
-   ```bash
-   export DATABASE_URL=postgresql://username:password@localhost:5432/finhackers
-   export OPENAI_API_KEY=your_openai_api_key
-   export SESSION_SECRET=your_session_secret
-   ```
-
-   On Windows:
-   ```
-   set DATABASE_URL=postgresql://username:password@localhost:5432/finhackers
-   set OPENAI_API_KEY=your_openai_api_key
-   set SESSION_SECRET=your_session_secret
-   ```
-
-4. Run the application:
-
-   ```bash
-   python main.py
-   ```
+- `/sentiment/{ticker}` - Get sentiment analysis for a ticker
+- `/politician-trades/{ticker}` - Get politician trades for a ticker
+- `/technical-analysis/{ticker}` - Get technical analysis for a ticker
+- `/fundamental-analysis/{ticker}` - Get fundamental analysis for a ticker
 
 ## License
 
-MIT License - Feel free to use, modify, and distribute this code.
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgements
+
+- [Anthropic Claude](https://anthropic.com/) for AI processing
+- [LangChain](https://www.langchain.com/) for LLM framework
+- [FastAPI](https://fastapi.tiangolo.com/) for API development
+- [Flask](https://flask.palletsprojects.com/) for web development
+- [Docker](https://www.docker.com/) for containerization

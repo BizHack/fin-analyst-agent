@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-signal me-2"></i>Market Signals Analysis</h5>
+                <form id="tickerForm" class="d-flex">
+                    <input type="hidden" name="tab_type" value="sentiment">
+                    <input type="text" name="ticker" class="form-control form-control-sm me-2" placeholder="Enter Ticker" value="AAPL" required>
+                    <button type="submit" class="btn btn-primary btn-sm">Analyze</button>
+                </form>
+            </div>
+            <div class="card-body">
+                <!-- Tabs navigation -->
+                <ul class="nav nav-tabs" id="marketTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" data-tab-type="sentiment" id="sentiment-tab" data-bs-toggle="tab" data-bs-target="#sentiment" type="button" role="tab" aria-controls="sentiment" aria-selected="true">
+                            <i class="fas fa-comments me-1"></i> Sentiment
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-tab-type="politician_trades" id="politician-tab" data-bs-toggle="tab" data-bs-target="#politician" type="button" role="tab" aria-controls="politician" aria-selected="false">
+                            <i class="fas fa-landmark me-1"></i> Politician Trades
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-tab-type="technical" id="technical-tab" data-bs-toggle="tab" data-bs-target="#technical" type="button" role="tab" aria-controls="technical" aria-selected="false">
+                            <i class="fas fa-chart-line me-1"></i> Technical Analysis
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-tab-type="fundamentals" id="fundamentals-tab" data-bs-toggle="tab" data-bs-target="#fundamentals" type="button" role="tab" aria-controls="fundamentals" aria-selected="false">
+                            <i class="fas fa-file-invoice-dollar me-1"></i> Fundamentals
+                        </button>
+                    </li>
+                </ul>
+                
+                <!-- Tab content -->
+                <div class="tab-content" id="tabContent">
+                    <!-- Content will be loaded here via AJAX -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Alerts Section -->
+        <div id="alertsContainer">
+            <!-- Alerts will be dynamically added here -->
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Market Movements Section -->
+        <div class="card mb-4 shadow-sm hover-card" id="marketMovements">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Market Movements</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-chart-area me-2"></i>SPY
+                        </div>
+                        <div>
+                            ${{ market_data.spy.price }}
+                            <span class="ms-2 {% if market_data.spy.change_direction == 'up' %}ticker-change-up{% else %}ticker-change-down{% endif %}">
+                                {% if market_data.spy.change_direction == 'up' %}
+                                <i class="fas fa-arrow-up"></i>
+                                {% else %}
+                                <i class="fas fa-arrow-down"></i>
+                                {% endif %}
+                                {{ market_data.spy.change }}%
+                            </span>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fab fa-bitcoin me-2"></i>Bitcoin
+                        </div>
+                        <div>
+                            ${{ market_data.bitcoin.price }}
+                            <span class="ms-2 {% if market_data.bitcoin.change_direction == 'up' %}ticker-change-up{% else %}ticker-change-down{% endif %}">
+                                {% if market_data.bitcoin.change_direction == 'up' %}
+                                <i class="fas fa-arrow-up"></i>
+                                {% else %}
+                                <i class="fas fa-arrow-down"></i>
+                                {% endif %}
+                                {{ market_data.bitcoin.change }}%
+                            </span>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-coins me-2"></i>Gold
+                        </div>
+                        <div>
+                            ${{ market_data.gold.price }}
+                            <span class="ms-2 {% if market_data.gold.change_direction == 'up' %}ticker-change-up{% else %}ticker-change-down{% endif %}">
+                                {% if market_data.gold.change_direction == 'up' %}
+                                <i class="fas fa-arrow-up"></i>
+                                {% else %}
+                                <i class="fas fa-arrow-down"></i>
+                                {% endif %}
+                                {{ market_data.gold.change }}%
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+                <div class="small text-muted text-end mt-2">
+                    Last updated: {{ market_data.timestamp }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Politician Posts Monitor Section -->
+        <div class="card mb-4 shadow-sm hover-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user-tie me-2"></i>Politician Posts Monitor</h5>
+            </div>
+            <div class="card-body">
+                {% for post in politician_posts[:5] %}
+                <div class="politician-post">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong>{{ post.politician }}</strong>
+                        <small class="text-muted">{{ post.date }}</small>
+                    </div>
+                    <p class="mb-1">{{ post.content }}</p>
+                    <small class="text-muted">Impact: {{ post.impact }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Agent Insights Section -->
+        <div class="card mb-4 shadow-sm hover-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-robot me-2"></i>Agent Insights</h5>
+                <button class="btn btn-sm btn-outline-primary" id="analyzeEventBtn">
+                    <i class="fas fa-bolt me-1"></i>Analyze New Event
+                </button>
+            </div>
+            <div class="card-body">
+                {% for insight in agent_insights[:5] %}
+                <div class="insight-{{ insight.priority|lower }} ps-2 py-1 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong>{{ insight.agent }}</strong>
+                        <small class="text-muted">{{ insight.timestamp }}</small>
+                    </div>
+                    <p class="mb-1">{{ insight.insight }}</p>
+                    <small class="text-muted">Tickers: {{ insight.tickers }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

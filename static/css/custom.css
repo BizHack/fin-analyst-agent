@@ -1,0 +1,65 @@
+/* Custom CSS for TrainingUp.ai */
+
+/* Only add minimal custom styles as needed, using Bootstrap classes where possible */
+.ticker-change-up {
+    color: #28a745; /* Bootstrap success green */
+}
+
+.ticker-change-down {
+    color: #dc3545; /* Bootstrap danger red */
+}
+
+.insight-high {
+    border-left: 4px solid #dc3545; /* Bootstrap danger red */
+}
+
+.insight-medium {
+    border-left: 4px solid #ffc107; /* Bootstrap warning yellow */
+}
+
+.insight-low {
+    border-left: 4px solid #17a2b8; /* Bootstrap info blue */
+}
+
+.social-post {
+    border-left: 3px solid #6c757d; /* Bootstrap secondary gray */
+    padding-left: 15px;
+    margin-bottom: 15px;
+}
+
+.politician-post {
+    border-left: 3px solid #007bff; /* Bootstrap primary blue */
+    padding-left: 15px;
+    margin-bottom: 15px;
+}
+
+.summary-box {
+    background-color: rgba(0, 123, 255, 0.1); /* Light blue background */
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+/* Adjustments for the tabs section */
+.tab-content {
+    padding: 20px;
+    background-color: rgba(33, 37, 41, 0.03); /* Slight background for tab content */
+    border-radius: 0 0 5px 5px;
+}
+
+/* Card hover effect */
+.hover-card {
+    transition: transform 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Logo styling */
+.app-logo {
+    font-weight: 700;
+    background: linear-gradient(45deg, #007bff, #6610f2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}

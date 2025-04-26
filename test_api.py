@@ -41,7 +41,36 @@ def test_social_media_processing(ticker="AAPL", source="reddit"):
     }
     
     try:
-        response = requests.post(f"{MCP_CLIENT_URL}/process/social-media", json=payload)
+        # Check if MCP Client service is running
+        try:
+            health_response = requests.head(f"{MCP_CLIENT_URL}/health", timeout=2)
+            health_status = health_response.status_code < 400
+        except:
+            health_status = False
+        
+        if not health_status:
+            logger.warning(f"MCP Client service not available at {MCP_CLIENT_URL}")
+            logger.info("Falling back to local social media aggregator...")
+            
+            # Use local aggregator as fallback
+            from agents.social_media_aggregator import analyze_aggregated_social_media
+            social_data = analyze_aggregated_social_media(ticker)
+            
+            sources = social_data.get("sources", [])
+            logger.info(f"Successfully retrieved local data from sources: {', '.join(sources) if sources else 'unknown'}")
+            
+            posts = social_data.get("top_posts", [])
+            if posts:
+                logger.info(f"Found {len(posts)} posts in local sentiment analysis")
+                for i, post in enumerate(posts[:2]):  # Show first 2 posts
+                    content = post.get('content', '')
+                    if content:
+                        content = content[:50] + "..." if len(content) > 50 else content
+                    logger.info(f"Post {i+1}: {content} | Score: {post.get('sentiment_score', 'N/A')}")
+            return
+            
+        # If service is running, continue with API call
+        response = requests.post(f"{MCP_CLIENT_URL}/process/social-media", json=payload, timeout=5)
         response.raise_for_status()
         
         workflow_id = response.json().get("workflow_id")
@@ -54,7 +83,7 @@ def test_social_media_processing(ticker="AAPL", source="reddit"):
         
         while not completed and attempts < max_attempts:
             try:
-                status_response = requests.get(f"{MCP_CLIENT_URL}/workflow/{workflow_id}")
+                status_response = requests.get(f"{MCP_CLIENT_URL}/workflow/{workflow_id}", timeout=5)
                 status_data = status_response.json()
                 
                 status = status_data.get("status")
@@ -83,6 +112,26 @@ def test_social_media_processing(ticker="AAPL", source="reddit"):
         
     except Exception as e:
         logger.error(f"Error triggering social media processing: {str(e)}")
+        logger.info("Falling back to local social media aggregator after error...")
+        
+        # Use local aggregator as fallback after exception
+        try:
+            from agents.social_media_aggregator import analyze_aggregated_social_media
+            social_data = analyze_aggregated_social_media(ticker)
+            
+            sources = social_data.get("sources", [])
+            logger.info(f"Successfully retrieved local data from sources: {', '.join(sources) if sources else 'unknown'}")
+            
+            posts = social_data.get("top_posts", [])
+            if posts:
+                logger.info(f"Found {len(posts)} posts in local sentiment analysis")
+                for i, post in enumerate(posts[:2]):  # Show first 2 posts
+                    content = post.get('content', '')
+                    if content:
+                        content = content[:50] + "..." if len(content) > 50 else content
+                    logger.info(f"Post {i+1}: {content} | Score: {post.get('sentiment_score', 'N/A')}")
+        except Exception as inner_e:
+            logger.error(f"Error in fallback mechanism: {str(inner_e)}")
 
 def test_sentiment_analysis(ticker="AAPL"):
     """

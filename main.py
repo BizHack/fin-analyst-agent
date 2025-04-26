@@ -154,21 +154,48 @@ def analyze_ticker():
                     if not sentiment_data.get("documents") or len(sentiment_data.get("documents", [])) == 0:
                         # Trigger data fetch from MCP Server and processing through MCP Client
                         logger.info(f"No sentiment data found for {ticker}, fetching from sources...")
-                        # Process news data for sentiment
-                        process_response = requests.post(
+                        # First, trigger Reddit data processing
+                        logger.info(f"Triggering Reddit data processing for {ticker}...")
+                        reddit_response = requests.post(
+                            f"{MCP_CLIENT_URL}/process/social-media",
+                            json={"source_type": "social", "source_name": "reddit", "params": {"ticker": ticker}}
+                        )
+                        if reddit_response.status_code == 200:
+                            reddit_workflow_id = reddit_response.json().get("workflow_id")
+                            logger.info(f"Started processing Reddit data for {ticker}, workflow ID: {reddit_workflow_id}")
+                        
+                        # Next, trigger Truth Social data processing
+                        logger.info(f"Triggering Truth Social data processing for {ticker}...")
+                        truth_response = requests.post(
+                            f"{MCP_CLIENT_URL}/process/social-media",
+                            json={"source_type": "social", "source_name": "truth_social", "params": {"ticker": ticker}}
+                        )
+                        if truth_response.status_code == 200:
+                            truth_workflow_id = truth_response.json().get("workflow_id")
+                            logger.info(f"Started processing Truth Social data for {ticker}, workflow ID: {truth_workflow_id}")
+                        
+                        # Also process news data for sentiment
+                        logger.info(f"Triggering news data processing for {ticker}...")
+                        news_response = requests.post(
                             f"{MCP_CLIENT_URL}/process/news",
                             json={"source_type": "news", "source_name": "cnbc"}
                         )
-                        if process_response.status_code == 200:
-                            workflow_id = process_response.json().get("workflow_id")
-                            logger.info(f"Started processing news for {ticker}, workflow ID: {workflow_id}")
+                        if news_response.status_code == 200:
+                            news_workflow_id = news_response.json().get("workflow_id")
+                            logger.info(f"Started processing news for {ticker}, workflow ID: {news_workflow_id}")
                         
-                        # Get existing demo data for now
-                        from agents.trump_agent import analyze_trump_posts
+                        # Get data from our aggregator while processing happens in background
+                        logger.info(f"Getting aggregated social media data for {ticker} from local sources...")
+                        from agents.social_media_aggregator import analyze_aggregated_social_media
+                        aggregated_data = analyze_aggregated_social_media(ticker)
+                        
+                        # Use the aggregated data for rendering
                         sentiment_data = {
-                            "documents": analyze_trump_posts(ticker),
-                            "sentiment_score": 0.65,
-                            "trending_topics": ["Earnings Call", "Product Launch", "Market Share"],
+                            "documents": aggregated_data.get("top_posts", []),
+                            "sentiment_score": sum(post.get("sentiment_score", 0.5) for post in aggregated_data.get("top_posts", [])) / 
+                                              max(len(aggregated_data.get("top_posts", [])), 1),
+                            "trending_topics": [topic.get("title") for topic in aggregated_data.get("trending_topics", [])[:3]],
+                            "sources": aggregated_data.get("sources", ["Social Media"])
                         }
                 
                 # Build summary based on sentiment score
@@ -190,10 +217,16 @@ def analyze_ticker():
                 # Use the documents as posts
                 posts = sentiment_data.get("documents", [])
                 
+                # Get additional data for display
+                sources = sentiment_data.get("sources", [])
+                last_updated = sentiment_data.get("last_updated", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                
                 return render_template('sentiment.html', 
                                     ticker=ticker, 
                                     posts=posts, 
-                                    summary=sentiment_summary)
+                                    summary=sentiment_summary,
+                                    sources=sources,
+                                    last_updated=last_updated)
             
             except Exception as e:
                 logger.error(f"Error getting sentiment data from Backend API: {str(e)}")
@@ -224,10 +257,16 @@ def analyze_ticker():
                 
                 sentiment_summary = f"Based on recent analysis from {sources}, {ticker} shows {sentiment_type} sentiment with trending discussions about {trending_topics}."
                 
+                # Get last_updated from social data
+                last_updated = social_data.get("last_updated", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                sources_list = social_data.get("sources", ["Reddit", "Truth Social"])
+                
                 return render_template('sentiment.html', 
                                     ticker=ticker, 
                                     posts=posts, 
-                                    summary=sentiment_summary)
+                                    summary=sentiment_summary,
+                                    sources=sources_list,
+                                    last_updated=last_updated)
             
         elif tab_type == 'politician_trades':
             # Get politician trades from Backend API

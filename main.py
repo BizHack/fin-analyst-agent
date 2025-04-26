@@ -186,16 +186,36 @@ def analyze_ticker():
                         
                         # Get data from our aggregator while processing happens in background
                         logger.info(f"Getting aggregated social media data for {ticker} from local sources...")
-                        from agents.social_media_aggregator import analyze_aggregated_social_media
+                        from agents.social_media_aggregator import analyze_aggregated_social_media, log_anthropic_api_usage
+                        
+                        # Log that we're starting sentiment analysis with Anthropic
+                        sentiment_start = log_anthropic_api_usage("sentiment_analysis", ticker)
+                        
+                        # Get ticker-specific social media data
                         aggregated_data = analyze_aggregated_social_media(ticker)
+                        
+                        # Log successful analysis with Anthropic
+                        log_anthropic_api_usage("sentiment_analysis", ticker, sentiment_start, True)
+                        
+                        # Check if we have ticker-specific data
+                        top_posts = aggregated_data.get("top_posts", [])
+                        logger.info(f"Found {len(top_posts)} posts for {ticker} in aggregated data")
+                        
+                        # Ensure ticker is mentioned in posts
+                        ticker_mentioned = any(ticker.lower() in post.get("content", "").lower() for post in top_posts)
+                        if ticker_mentioned:
+                            logger.info(f"Ticker {ticker} found in post content")
+                        else:
+                            logger.warning(f"Ticker {ticker} not found in post content, may be using fallback data")
                         
                         # Use the aggregated data for rendering
                         sentiment_data = {
-                            "documents": aggregated_data.get("top_posts", []),
-                            "sentiment_score": sum(post.get("sentiment_score", 0.5) for post in aggregated_data.get("top_posts", [])) / 
-                                              max(len(aggregated_data.get("top_posts", [])), 1),
+                            "documents": top_posts,
+                            "sentiment_score": sum(post.get("sentiment_score", 0.5) for post in top_posts) / 
+                                              max(len(top_posts), 1) if top_posts else 0.5,
                             "trending_topics": [topic.get("title") for topic in aggregated_data.get("trending_topics", [])[:3]],
-                            "sources": aggregated_data.get("sources", ["Social Media"])
+                            "sources": aggregated_data.get("sources", ["Social Media"]),
+                            "last_updated": aggregated_data.get("last_updated", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                         }
                 
                 # Build summary based on sentiment score
@@ -231,14 +251,33 @@ def analyze_ticker():
             except Exception as e:
                 logger.error(f"Error getting sentiment data from Backend API: {str(e)}")
                 # Fallback to existing implementation
-                from agents.social_media_aggregator import analyze_aggregated_social_media
+                from agents.social_media_aggregator import analyze_aggregated_social_media, log_anthropic_api_usage
                 
-                # This will combine data from both Reddit and Truth Social
+                # Log that we're starting sentiment analysis with Anthropic in the fallback path
+                sentiment_start = log_anthropic_api_usage("sentiment_analysis_fallback", ticker)
+                
+                # This will combine data from both Reddit and Truth Social with ticker-specific content
+                logger.info(f"Using social media aggregator fallback for {ticker} after API error")
                 social_data = analyze_aggregated_social_media(ticker)
                 
+                # Log successful fallback analysis with Anthropic
+                log_anthropic_api_usage("sentiment_analysis_fallback", ticker, sentiment_start, True)
+                
                 # Process the social data
-                posts = social_data.get("posts", [])
-                sentiment_score = social_data.get("sentiment_score", 0.5)
+                top_posts = social_data.get("top_posts", [])
+                logger.info(f"Found {len(top_posts)} posts for {ticker} in fallback data")
+                
+                # Check if we have ticker-specific data
+                ticker_mentioned = any(ticker.lower() in post.get("content", "").lower() for post in top_posts)
+                if ticker_mentioned:
+                    logger.info(f"Ticker {ticker} found in post content from fallback")
+                else:
+                    logger.warning(f"Ticker {ticker} not found in fallback post content")
+                
+                # Use top_posts for display
+                posts = top_posts
+                sentiment_scores = [post.get("sentiment_score", 0.5) for post in top_posts if "sentiment_score" in post]
+                sentiment_score = sum(sentiment_scores) / max(len(sentiment_scores), 1) if sentiment_scores else 0.5
                 
                 # Determine sentiment type based on score
                 if sentiment_score > 0.7:

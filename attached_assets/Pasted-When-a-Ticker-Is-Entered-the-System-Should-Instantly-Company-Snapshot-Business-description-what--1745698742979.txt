@@ -1,0 +1,161 @@
+When a Ticker Is Entered, the System Should Instantly:
+Company Snapshot
+
+Business description (what they do)
+
+Key stats (market cap, sector, industry, headquarters)
+
+Management team (CEO, CFO, etc.)
+
+Financial Overview
+
+Last 5 years of financials (income, balance sheet, cash flows)
+
+Growth rates (Revenue, EBITDA, EPS)
+
+Profitability (margins, ROE, ROIC)
+
+Leverage metrics (Debt/Equity, Interest Coverage)
+
+Valuation Metrics
+
+P/E, EV/EBITDA, P/B, P/S
+
+Compared to sector/peers
+
+Discounted Cash Flow (optional, automated DCF)
+
+Stock Performance
+
+Historical stock price charts
+
+Beta (volatility)
+
+Short interest %
+
+Recent News & Events
+
+Earnings announcements
+
+M&A news
+
+Regulatory developments
+
+Insider buying/selling
+
+Analyst Sentiment
+
+Consensus ratings (Buy/Hold/Sell)
+
+Price targets
+
+Earnings estimate trends
+
+Catalysts
+
+Upcoming earnings call
+
+Product launches
+
+Legal/regulatory risks
+
+Macro tailwinds/headwinds
+
+Risk Factors
+
+Debt loads
+
+Competitive pressures
+
+Exposure to macro trends (e.g., interest rates, inflation)
+
+Peer Comparison
+
+Side-by-side with competitors (metrics, valuations)
+
+Optional: Alternative Data Insights
+
+Web traffic trends
+
+Sentiment from social media
+
+Credit card data (sales trends)
+12:41
+1. Company Financials
+Balance sheets, income statements, cash flow statements
+
+Key ratios: ROE, ROIC, debt/equity, margins
+
+SEC filings (10-K, 10-Q, 8-K, proxy statements)
+
+Data sources: EDGAR, S&P CapitalIQ, FactSet, Bloomberg, Yahoo Finance APIs
+
+2. Valuation Metrics
+Multiples (P/E, EV/EBITDA, P/B, P/S)
+
+Analyst consensus estimates (EPS, Revenue growth projections)
+
+Discounted Cash Flow (DCF) assumptions: WACC, growth rates
+
+3. Market Data
+Stock prices (historical and real-time)
+
+Volatility, beta
+
+Short interest
+
+Trading volume
+
+4. Macro and Sector Data
+Interest rates
+
+Inflation trends
+
+GDP growth forecasts
+
+Sector-specific indicators (e.g., oil prices for energy stocks, chip inventories for semiconductors)
+
+5. Alternative Data (for alpha)
+Web traffic (SimilarWeb, SensorTower)
+
+Satellite imagery (foot traffic to stores)
+
+Credit card transaction data
+
+Social media sentiment (Reddit, X/Twitter, Stocktwits)
+
+6. News and Events
+Earnings releases
+
+M&A activity
+
+Regulatory changes
+
+Executive changes
+
+Lawsuits / litigation risks
+
+Sources: RSS feeds, Bloomberg Terminal, AI scrapers
+
+7. Risk Metrics
+Value at Risk (VaR)
+
+Scenario analysis
+
+Stress testing models
+
+ESG risks (if required)
+
+8. Investment Thesis Frameworks
+Long thesis builder
+
+Short thesis builder
+
+Catalysts calendar (what events could move the stock?)
+
+9. Portfolio Construction Inputs (if deeper automation)
+Position sizing rules
+
+Diversification targets
+
+Correlation matrices

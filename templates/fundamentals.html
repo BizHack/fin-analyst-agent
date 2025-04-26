@@ -1,111 +1,560 @@
-<div class="mt-4">
-    <div class="summary-box">
-        <h5><i class="fas fa-file-invoice-dollar me-2"></i>Fundamental Analysis for {{ ticker }}</h5>
-        <p>{{ summary }}</p>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-black">{{ ticker }} - Fundamental Analysis</h1>
+        <p class="text-black mt-2">{{ summary }}</p>
     </div>
-    
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0">Company Overview</h6>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Company:</span>
-                        <strong>{{ data.company_name }}</strong>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Sector:</span>
-                        <strong>{{ data.sector }}</strong>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Industry:</span>
-                        <strong>{{ data.industry }}</strong>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span>Market Cap:</span>
-                        <strong>${{ data.market_cap }}B</strong>
-                    </div>
+
+    <!-- Company Snapshot Section -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+        <h2 class="text-2xl font-semibold text-black mb-4">Company Snapshot</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Business Description -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h3 class="text-lg font-medium text-black mb-2">Business Description</h3>
+                <p class="text-black">{{ data.business_description }}</p>
+            </div>
+            
+            <!-- Key Stats -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h3 class="text-lg font-medium text-black mb-2">Key Statistics</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="text-black"><strong>Market Cap:</strong></div>
+                    <div class="text-black">${{ data.market_cap }}B</div>
+                    
+                    <div class="text-black"><strong>Sector:</strong></div>
+                    <div class="text-black">{{ data.sector }}</div>
+                    
+                    <div class="text-black"><strong>Industry:</strong></div>
+                    <div class="text-black">{{ data.industry }}</div>
+                    
+                    <div class="text-black"><strong>Headquarters:</strong></div>
+                    <div class="text-black">{{ data.headquarters }}</div>
                 </div>
             </div>
         </div>
         
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0">Key Metrics</h6>
+        <!-- Management Team -->
+        <div class="mt-6 bg-gray-50 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-black mb-2">Management Team</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {% for exec in data.management %}
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-blue-800 font-bold">{{ exec.name[:1] }}</span>
+                    </div>
+                    <div>
+                        <p class="font-medium text-black">{{ exec.name }}</p>
+                        <p class="text-sm text-black">{{ exec.title }}</p>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>P/E Ratio:</span>
-                        <strong>{{ data.pe_ratio }}</strong>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Financial Overview Section -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+        <h2 class="text-2xl font-semibold text-black mb-4">Financial Overview</h2>
+        
+        <!-- Financial Tabs -->
+        <div class="border-b border-gray-200">
+            <ul class="flex flex-wrap -mb-px" id="financeTab" role="tablist">
+                <li class="mr-2" role="presentation">
+                    <button class="inline-block p-4 border-b-2 border-blue-600 rounded-t-lg text-black active" id="income-tab" data-tabs-target="#income" type="button" role="tab" aria-controls="income" aria-selected="true">Income Statement</button>
+                </li>
+                <li class="mr-2" role="presentation">
+                    <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-gray-300 text-black" id="balance-tab" data-tabs-target="#balance" type="button" role="tab" aria-controls="balance" aria-selected="false">Balance Sheet</button>
+                </li>
+                <li class="mr-2" role="presentation">
+                    <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-gray-300 text-black" id="cashflow-tab" data-tabs-target="#cashflow" type="button" role="tab" aria-controls="cashflow" aria-selected="false">Cash Flow</button>
+                </li>
+                <li role="presentation">
+                    <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-gray-300 text-black" id="metrics-tab" data-tabs-target="#metrics" type="button" role="tab" aria-controls="metrics" aria-selected="false">Key Metrics</button>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Financial Content -->
+        <div id="financeTabContent">
+            <!-- Income Statement -->
+            <div class="p-4 rounded-lg bg-gray-50 mt-4 block" id="income" role="tabpanel" aria-labelledby="income-tab">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
+                                {% for year in data.years %}
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ year }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for item in data.income_statement %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-black">{{ item.metric }}</td>
+                                {% for value in item.values %}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-black">{{ value }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Balance Sheet -->
+            <div class="p-4 rounded-lg bg-gray-50 mt-4 hidden" id="balance" role="tabpanel" aria-labelledby="balance-tab">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
+                                {% for year in data.years %}
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ year }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for item in data.balance_sheet %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-black">{{ item.metric }}</td>
+                                {% for value in item.values %}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-black">{{ value }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Cash Flow -->
+            <div class="p-4 rounded-lg bg-gray-50 mt-4 hidden" id="cashflow" role="tabpanel" aria-labelledby="cashflow-tab">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
+                                {% for year in data.years %}
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ year }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for item in data.cash_flow %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-black">{{ item.metric }}</td>
+                                {% for value in item.values %}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-black">{{ value }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Key Metrics -->
+            <div class="p-4 rounded-lg bg-gray-50 mt-4 hidden" id="metrics" role="tabpanel" aria-labelledby="metrics-tab">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Growth Rates -->
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h4 class="font-semibold text-black mb-2">Growth Rates</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-black">Revenue Growth (YoY)</span>
+                                <span class="text-black">{{ data.growth.revenue }}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-black">EBITDA Growth (YoY)</span>
+                                <span class="text-black">{{ data.growth.ebitda }}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-black">EPS Growth (YoY)</span>
+                                <span class="text-black">{{ data.growth.eps }}%</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Dividend Yield:</span>
-                        <strong>{{ data.dividend_yield }}%</strong>
+                    
+                    <!-- Profitability -->
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h4 class="font-semibold text-black mb-2">Profitability</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-black">Gross Margin</span>
+                                <span class="text-black">{{ data.profitability.gross_margin }}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-black">Operating Margin</span>
+                                <span class="text-black">{{ data.profitability.operating_margin }}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-black">Net Margin</span>
+                                <span class="text-black">{{ data.profitability.net_margin }}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-black">ROE</span>
+                                <span class="text-black">{{ data.profitability.roe }}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-black">ROIC</span>
+                                <span class="text-black">{{ data.profitability.roic }}%</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>52-Week High:</span>
-                        <strong>${{ data.52w_high }}</strong>
+                    
+                    <!-- Leverage -->
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h4 class="font-semibold text-black mb-2">Leverage</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-black">Debt/Equity</span>
+                                <span class="text-black">{{ data.leverage.debt_equity }}x</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-black">Net Debt/EBITDA</span>
+                                <span class="text-black">{{ data.leverage.net_debt_ebitda }}x</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-black">Interest Coverage</span>
+                                <span class="text-black">{{ data.leverage.interest_coverage }}x</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="d-flex justify-content-between">
-                        <span>52-Week Low:</span>
-                        <strong>${{ data.52w_low }}</strong>
+                    
+                    <!-- Valuation -->
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h4 class="font-semibold text-black mb-2">Valuation</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-black">P/E</span>
+                                <span class="text-black">{{ data.valuation.pe }}x</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-black">EV/EBITDA</span>
+                                <span class="text-black">{{ data.valuation.ev_ebitda }}x</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-black">P/B</span>
+                                <span class="text-black">{{ data.valuation.pb }}x</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-black">P/S</span>
+                                <span class="text-black">{{ data.valuation.ps }}x</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <div class="card mt-2">
-        <div class="card-header">
-            <h6 class="mb-0">Earnings Overview</h6>
+    <!-- Peer Comparison -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+        <h2 class="text-2xl font-semibold text-black mb-4">Peer Comparison</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Market Cap</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/E</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EV/EBITDA</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue Growth</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Operating Margin</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for peer in data.peers %}
+                    <tr class="{% if peer.ticker == ticker %}bg-blue-50{% endif %}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-black">{{ peer.name }} ({{ peer.ticker }})</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-black">${{ peer.market_cap }}B</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-black">{{ peer.pe }}x</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-black">{{ peer.ev_ebitda }}x</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-black">{{ peer.revenue_growth }}%</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-black">{{ peer.operating_margin }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Revenue:</span>
-                        <strong>${{ data.revenue }}B</strong>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>EPS:</span>
-                        <strong>{{ data.eps }}</strong>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span>EPS Status:</span>
-                        <strong>
-                            {% if data.eps_status == 'beating' %}
-                            <span class="text-success">Beating Expectations</span>
-                            {% elif data.eps_status == 'meeting' %}
-                            <span class="text-warning">Meeting Expectations</span>
-                            {% else %}
-                            <span class="text-danger">Missing Expectations</span>
-                            {% endif %}
-                        </strong>
+    </div>
+    
+    <!-- Analyst Sentiment Section -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+        <h2 class="text-2xl font-semibold text-black mb-4">Analyst Sentiment</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Consensus Ratings -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h3 class="text-lg font-medium text-black mb-4">Consensus Ratings</h3>
+                <div class="flex items-center justify-center">
+                    <div class="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center relative">
+                        <div class="w-24 h-24 rounded-full 
+                            {% if data.analyst.buy_percentage > 70 %}bg-green-500{% elif data.analyst.buy_percentage > 40 %}bg-yellow-400{% else %}bg-red-500{% endif %}
+                            flex items-center justify-center">
+                            <span class="text-white text-2xl font-bold">{{ data.analyst.buy_percentage }}%</span>
+                        </div>
+                        <div class="absolute bottom-0 right-0 w-12 h-12 rounded-full bg-white border-4 border-gray-200 flex items-center justify-center">
+                            <span class="text-gray-800 font-bold">{{ data.analyst.rating }}</span>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Guidance:</span>
-                        <strong>
-                            {% if data.guidance == 'positive' %}
-                            <span class="text-success">Positive</span>
-                            {% elif data.guidance == 'neutral' %}
-                            <span class="text-warning">Neutral</span>
-                            {% else %}
-                            <span class="text-danger">Cautious</span>
-                            {% endif %}
-                        </strong>
+                <div class="grid grid-cols-3 gap-2 mt-4 text-center">
+                    <div>
+                        <p class="text-sm text-black font-semibold">Buy</p>
+                        <p class="text-black">{{ data.analyst.buy_count }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-black font-semibold">Hold</p>
+                        <p class="text-black">{{ data.analyst.hold_count }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-black font-semibold">Sell</p>
+                        <p class="text-black">{{ data.analyst.sell_count }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Price Targets -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h3 class="text-lg font-medium text-black mb-2">Price Targets</h3>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-black">Current: ${{ data.price.current }}</span>
+                    <span class="text-black">Avg Target: ${{ data.price.target_avg }}</span>
+                </div>
+                <div class="relative pt-1">
+                    <div class="flex mb-2 items-center justify-between">
+                        <div>
+                            <span class="text-xs font-semibold inline-block text-black">
+                                Low: ${{ data.price.target_low }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold inline-block text-black">
+                                High: ${{ data.price.target_high }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
+                        <div style="width:{{ data.price.current_percentage }}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"></div>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-xs text-black">Upside: {{ data.price.upside }}%</span>
+                        <span class="text-xs text-black">Analysts: {{ data.analyst.total_count }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Earnings Estimates -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h3 class="text-lg font-medium text-black mb-2">Earnings Estimates</h3>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-sm text-black font-semibold">EPS Estimates</p>
+                        <div class="grid grid-cols-2 gap-2 mt-1">
+                            <div class="text-xs text-black">Current Quarter:</div>
+                            <div class="text-xs text-black">${{ data.estimates.eps_current_quarter }}</div>
+                            
+                            <div class="text-xs text-black">Next Quarter:</div>
+                            <div class="text-xs text-black">${{ data.estimates.eps_next_quarter }}</div>
+                            
+                            <div class="text-xs text-black">Current Year:</div>
+                            <div class="text-xs text-black">${{ data.estimates.eps_current_year }}</div>
+                            
+                            <div class="text-xs text-black">Next Year:</div>
+                            <div class="text-xs text-black">${{ data.estimates.eps_next_year }}</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <p class="text-sm text-black font-semibold">Revenue Estimates</p>
+                        <div class="grid grid-cols-2 gap-2 mt-1">
+                            <div class="text-xs text-black">Current Quarter:</div>
+                            <div class="text-xs text-black">${{ data.estimates.rev_current_quarter }}B</div>
+                            
+                            <div class="text-xs text-black">Next Quarter:</div>
+                            <div class="text-xs text-black">${{ data.estimates.rev_next_quarter }}B</div>
+                            
+                            <div class="text-xs text-black">Current Year:</div>
+                            <div class="text-xs text-black">${{ data.estimates.rev_current_year }}B</div>
+                            
+                            <div class="text-xs text-black">Next Year:</div>
+                            <div class="text-xs text-black">${{ data.estimates.rev_next_year }}B</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <div class="alert alert-info mt-4">
-        <i class="fas fa-info-circle me-2"></i>
-        Fundamental analysis examines a company's financial statements, market position, and growth prospects. The system analyzes earnings reports, guidance, and management commentary to identify potential long-term investment opportunities.
+    <!-- Recent News Section -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+        <h2 class="text-2xl font-semibold text-black mb-4">Recent News & Events</h2>
+        
+        <div class="space-y-4">
+            {% for news in data.news %}
+            <div class="border-b border-gray-100 pb-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between">
+                    <h3 class="text-lg font-semibold text-black">{{ news.title }}</h3>
+                    <span class="text-xs text-black">{{ news.date }}</span>
+                </div>
+                <p class="text-black text-sm mt-2">{{ news.summary }}</p>
+                <div class="mt-2">
+                    <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">{{ news.source }}</span>
+                    {% if news.tags %}
+                        {% for tag in news.tags %}
+                        <span class="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded ml-1">{{ tag }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Insider Trading & Ownership Section -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+        <h2 class="text-2xl font-semibold text-black mb-4">Insider Trading & Ownership</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Insider Transactions -->
+            <div>
+                <h3 class="text-lg font-medium text-black mb-3">Recent Insider Transactions</h3>
+                <div class="space-y-3">
+                    {% for transaction in data.insider_transactions %}
+                    <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+                        <div>
+                            <p class="font-medium text-black">{{ transaction.name }}</p>
+                            <p class="text-sm text-black">{{ transaction.title }}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-medium {% if transaction.type == 'Buy' %}text-green-600{% else %}text-red-600{% endif %}">
+                                {{ transaction.type }}: {{ transaction.shares }} shares
+                            </p>
+                            <p class="text-sm text-black">${{ transaction.price }} on {{ transaction.date }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Ownership Structure -->
+            <div>
+                <h3 class="text-lg font-medium text-black mb-3">Ownership Structure</h3>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-medium text-black mb-2">Institutional Ownership</h4>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ data.ownership.institutional }}%"></div>
+                            </div>
+                            <p class="text-sm text-black mt-1">{{ data.ownership.institutional }}% ({{ data.ownership.institutional_change }}% change)</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-medium text-black mb-2">Insider Ownership</h4>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-green-600 h-2.5 rounded-full" style="width: {{ data.ownership.insider }}%"></div>
+                            </div>
+                            <p class="text-sm text-black mt-1">{{ data.ownership.insider }}%</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-medium text-black mb-2">Short Interest</h4>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-red-600 h-2.5 rounded-full" style="width: {{ data.ownership.short_interest }}%"></div>
+                            </div>
+                            <p class="text-sm text-black mt-1">{{ data.ownership.short_interest }}% of float ({{ data.ownership.short_interest_change }}% change)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Risk Factors Section -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-2xl font-semibold text-black mb-4">Risk Factors & Catalysts</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Catalysts -->
+            <div>
+                <h3 class="text-lg font-medium text-black mb-3">Upcoming Catalysts</h3>
+                <div class="space-y-3">
+                    {% for catalyst in data.catalysts %}
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center mr-3 mt-1">
+                            <span class="text-white text-xs">{{ loop.index }}</span>
+                        </div>
+                        <div>
+                            <p class="font-medium text-black">{{ catalyst.event }}</p>
+                            <p class="text-sm text-black">{{ catalyst.date }} • {{ catalyst.impact }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Risk Factors -->
+            <div>
+                <h3 class="text-lg font-medium text-black mb-3">Key Risk Factors</h3>
+                <div class="space-y-3">
+                    {% for risk in data.risk_factors %}
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="flex items-center justify-between">
+                            <p class="font-medium text-black">{{ risk.factor }}</p>
+                            <span class="px-2 py-1 text-xs rounded-full {% if risk.severity == 'High' %}bg-red-100 text-red-800{% elif risk.severity == 'Medium' %}bg-yellow-100 text-yellow-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                                {{ risk.severity }}
+                            </span>
+                        </div>
+                        <p class="text-sm text-black mt-1">{{ risk.detail }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Finance Tab JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Finance Tabs
+        const financeTabButtons = document.querySelectorAll('#financeTab button');
+        const financeTabContents = document.querySelectorAll('#financeTabContent > div');
+        
+        financeTabButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const tabTarget = button.getAttribute('data-tabs-target');
+                
+                // Hide all tab contents
+                financeTabContents.forEach(content => {
+                    content.classList.add('hidden');
+                    content.classList.remove('block');
+                });
+                
+                // Remove active class from all buttons
+                financeTabButtons.forEach(btn => {
+                    btn.classList.remove('border-blue-600');
+                    btn.classList.add('border-transparent');
+                    btn.setAttribute('aria-selected', false);
+                });
+                
+                // Add active class to clicked button
+                button.classList.add('border-blue-600');
+                button.classList.remove('border-transparent');
+                button.setAttribute('aria-selected', true);
+                
+                // Show the selected tab content
+                document.querySelector(tabTarget).classList.remove('hidden');
+                document.querySelector(tabTarget).classList.add('block');
+            });
+        });
+    });
+</script>
+{% endblock %}

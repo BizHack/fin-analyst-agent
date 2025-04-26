@@ -626,7 +626,74 @@
                 <!-- Fundamental Tab -->
                 <div id="fundamental-tab" class="tab-panel hidden">
                     <h3 class="text-xl font-semibold text-black mb-4">Fundamental Analysis</h3>
-                    <p class="text-black">Loading fundamental data for the selected stock...</p>
+                    <p class="text-black mb-4">Please select a stock to view detailed financial data, valuation metrics, peer comparison, and analyst sentiment.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- Quick Valuation Card -->
+                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <h4 class="text-lg font-semibold text-black mb-3">Key Valuation Metrics</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between pb-2 border-b border-gray-100">
+                                    <span class="text-black">P/E Ratio</span>
+                                    <span class="text-black font-medium">-</span>
+                                </div>
+                                <div class="flex justify-between pb-2 border-b border-gray-100">
+                                    <span class="text-black">P/S Ratio</span>
+                                    <span class="text-black font-medium">-</span>
+                                </div>
+                                <div class="flex justify-between pb-2 border-b border-gray-100">
+                                    <span class="text-black">EV/EBITDA</span>
+                                    <span class="text-black font-medium">-</span>
+                                </div>
+                                <div class="flex justify-between pb-2 border-b border-gray-100">
+                                    <span class="text-black">P/B Ratio</span>
+                                    <span class="text-black font-medium">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-black">Dividend Yield</span>
+                                    <span class="text-black font-medium">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Financials Card -->
+                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <h4 class="text-lg font-semibold text-black mb-3">Financial Snapshot</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between pb-2 border-b border-gray-100">
+                                    <span class="text-black">Revenue (TTM)</span>
+                                    <span class="text-black font-medium">-</span>
+                                </div>
+                                <div class="flex justify-between pb-2 border-b border-gray-100">
+                                    <span class="text-black">Net Income (TTM)</span>
+                                    <span class="text-black font-medium">-</span>
+                                </div>
+                                <div class="flex justify-between pb-2 border-b border-gray-100">
+                                    <span class="text-black">Profit Margin</span>
+                                    <span class="text-black font-medium">-</span>
+                                </div>
+                                <div class="flex justify-between pb-2 border-b border-gray-100">
+                                    <span class="text-black">Operating Margin</span>
+                                    <span class="text-black font-medium">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-black">Free Cash Flow (TTM)</span>
+                                    <span class="text-black font-medium">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Action Button -->
+                    <div class="mb-6 text-center">
+                        <p class="mb-4 text-black">
+                            <strong>Pro Tip:</strong> For a comprehensive fundamental analysis including financial statements, valuation metrics, 
+                            peer comparison, and analyst sentiment, select a stock from the dropdown above.
+                        </p>
+                        <button type="button" id="viewFullFundamentals" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+                            View Full Fundamental Analysis Dashboard
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

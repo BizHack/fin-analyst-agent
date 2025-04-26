@@ -227,11 +227,61 @@ function updateMarketPulse(data) {
 function setupEventListeners() {
     // Add any additional event listeners here
     
-    // Example: Listen for simulate event button clicks
+    // Listen for simulate event button clicks
     const simulateEventButton = document.getElementById('simulate-event');
     if (simulateEventButton) {
         simulateEventButton.addEventListener('click', simulateMarketEvent);
     }
+    
+    // Listen for full fundamentals button click
+    const viewFullFundamentalsButton = document.getElementById('viewFullFundamentals');
+    if (viewFullFundamentalsButton) {
+        viewFullFundamentalsButton.addEventListener('click', () => {
+            // Get the selected stock
+            const stockSelect = document.getElementById('stock-select');
+            if (stockSelect && stockSelect.value) {
+                loadFullFundamentalAnalysis(stockSelect.value);
+            } else {
+                // Alert user to select a stock first
+                alert('Please select a stock from the dropdown first.');
+            }
+        });
+    }
+}
+
+/**
+ * Load full fundamental analysis page for a ticker
+ * @param {string} ticker - Stock ticker symbol
+ */
+function loadFullFundamentalAnalysis(ticker) {
+    console.log(`Loading full fundamental analysis for ${ticker}...`);
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('ticker', ticker);
+    formData.append('tab_type', 'fundamentals');
+    
+    // Send AJAX request to the backend
+    fetch('/analyze_ticker', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(html => {
+        // Replace the entire page content with the fundamentals page
+        document.open();
+        document.write(html);
+        document.close();
+    })
+    .catch(error => {
+        console.error('Error loading fundamental analysis:', error);
+        alert('Failed to load fundamental analysis. Please try again.');
+    });
 }
 
 /**

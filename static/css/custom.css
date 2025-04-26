@@ -72,12 +72,41 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Dropdown select styling for better visibility */
-select option {
+select,
+select option,
+.dropdown-menu,
+.dropdown-item,
+.dropdown-toggle,
+.dropdown-menu li a,
+.custom-select,
+.form-select,
+.select-selected,
+div[role="menu"],
+div[role="listbox"],
+[role="menuitem"],
+.menu-item,
+ul.dropdown li a {
   color: #000000 !important;
   background-color: #ffffff;
 }
 
-#stock-select {
+#stock-select,
+.stock-select {
+  color: #000000 !important;
+}
+
+/* Specifically target Bootstrap dropdown menus */
+.dropdown-menu .dropdown-item {
+  color: #000000 !important;
+}
+
+/* Force text color for all dropdown menu related elements */
+*[class*="dropdown"],
+*[class*="select"],
+*[class*="menu"],
+*[id*="dropdown"],
+*[id*="select"],
+*[id*="menu"] {
   color: #000000 !important;
 }
 

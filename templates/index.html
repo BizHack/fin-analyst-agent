@@ -625,71 +625,187 @@
                 
                 <!-- Fundamental Tab -->
                 <div id="fundamental-tab" class="tab-panel hidden">
-                    <h3 class="text-xl font-semibold text-black mb-4">Fundamental Analysis</h3>
-                    <p class="text-black mb-4">Please select a stock to view detailed financial data, valuation metrics, peer comparison, and analyst sentiment.</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <!-- Quick Valuation Card -->
-                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-                            <h4 class="text-lg font-semibold text-black mb-3">Key Valuation Metrics</h4>
-                            <div class="space-y-2">
-                                <div class="flex justify-between pb-2 border-b border-gray-100">
-                                    <span class="text-black">P/E Ratio</span>
-                                    <span class="text-black font-medium">-</span>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2">
+                            <div class="flex items-center mb-4">
+                                <span class="text-blue-500 mr-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                </span>
+                                <h3 class="text-xl font-semibold text-black">Fundamental Analysis - <span class="ticker-symbol">AAPL</span></h3>
+                            </div>
+                            <p class="text-black mb-4">Earnings reports and financial metrics</p>
+                            
+                            <div id="company-summary" class="text-black mb-6">
+                                Apple continues to display strong fundamental metrics with a 15% year-over-year revenue growth and expanding profit margins. Recent earnings call highlighted significant growth in services revenue, now accounting for 25% of total revenue. Management emphasized AI integration plans for upcoming product lines. Balance sheet remains exceptionally strong with $195B cash and short-term investments.
+                            </div>
+                            
+                            <!-- Quarterly Performance Chart -->
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold text-black mb-3">Quarterly Performance</h4>
+                                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100" style="height: 300px;">
+                                    <!-- Chart would be rendered here -->
+                                    <img src="https://via.placeholder.com/800x300?text=Quarterly+Performance+Chart" alt="Quarterly Performance Chart" class="w-full h-full object-contain" />
                                 </div>
-                                <div class="flex justify-between pb-2 border-b border-gray-100">
-                                    <span class="text-black">P/S Ratio</span>
-                                    <span class="text-black font-medium">-</span>
+                            </div>
+                            
+                            <!-- Key Metrics and Earnings Call -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <!-- Key Metrics -->
+                                <div>
+                                    <h4 class="text-lg font-semibold text-black mb-3">Key Metrics</h4>
+                                    <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+                                        <div class="space-y-2">
+                                            <div class="flex justify-between pb-2 border-b border-gray-100">
+                                                <span class="text-black">Revenue</span>
+                                                <span class="text-black font-medium">Q1 2025: $96.5B (+15%)</span>
+                                            </div>
+                                            <div class="flex justify-between pb-2 border-b border-gray-100">
+                                                <span class="text-black">EPS</span>
+                                                <span class="text-black font-medium">$1.89 (+8%)</span>
+                                            </div>
+                                            <div class="flex justify-between pb-2 border-b border-gray-100">
+                                                <span class="text-black">P/E Ratio</span>
+                                                <span class="text-black font-medium">24.6x</span>
+                                            </div>
+                                            <div class="flex justify-between pb-2 border-b border-gray-100">
+                                                <span class="text-black">Dividend Yield</span>
+                                                <span class="text-black font-medium">0.5%</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-black">Debt-to-Equity</span>
+                                                <span class="text-black font-medium">0.3</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="flex justify-between pb-2 border-b border-gray-100">
-                                    <span class="text-black">EV/EBITDA</span>
-                                    <span class="text-black font-medium">-</span>
-                                </div>
-                                <div class="flex justify-between pb-2 border-b border-gray-100">
-                                    <span class="text-black">P/B Ratio</span>
-                                    <span class="text-black font-medium">-</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-black">Dividend Yield</span>
-                                    <span class="text-black font-medium">-</span>
+                                
+                                <!-- Earnings Call Sentiment -->
+                                <div>
+                                    <h4 class="text-lg font-semibold text-black mb-3">Earnings Call Sentiment</h4>
+                                    <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+                                        <!-- Sentiment Bar -->
+                                        <div class="mb-4">
+                                            <div class="flex w-full h-2 mb-2 bg-gray-200 rounded-full overflow-hidden">
+                                                <div class="bg-green-500" style="width: 55%"></div>
+                                                <div class="bg-gray-400" style="width: 30%"></div>
+                                                <div class="bg-red-500" style="width: 15%"></div>
+                                            </div>
+                                            <div class="flex justify-between text-xs">
+                                                <span class="text-green-600">55% Positive</span>
+                                                <span class="text-gray-500">30% Neutral</span>
+                                                <span class="text-red-600">15% Negative</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Key Topics -->
+                                        <div>
+                                            <h5 class="text-sm font-medium text-black mb-2">Key Topics Mentioned</h5>
+                                            <div class="flex flex-wrap gap-2">
+                                                <span class="px-3 py-1 bg-gray-100 text-black text-xs rounded-full">AI Investments</span>
+                                                <span class="px-3 py-1 bg-gray-100 text-black text-xs rounded-full">Search Revenue</span>
+                                                <span class="px-3 py-1 bg-gray-100 text-black text-xs rounded-full">Cloud Profitability</span>
+                                                <span class="px-3 py-1 bg-gray-100 text-black text-xs rounded-full">YouTube Growth</span>
+                                                <span class="px-3 py-1 bg-gray-100 text-black text-xs rounded-full">Regulatory Challenges</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Quick Financials Card -->
-                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-                            <h4 class="text-lg font-semibold text-black mb-3">Financial Snapshot</h4>
-                            <div class="space-y-2">
-                                <div class="flex justify-between pb-2 border-b border-gray-100">
-                                    <span class="text-black">Revenue (TTM)</span>
-                                    <span class="text-black font-medium">-</span>
+                        <!-- Analyst Consensus Card -->
+                        <div>
+                            <div class="flex items-center mb-4">
+                                <span class="text-blue-500 mr-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-award"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                                </span>
+                                <h3 class="text-xl font-semibold text-black">Analyst Consensus</h3>
+                            </div>
+                            <p class="text-black mb-4">Wall Street expectations</p>
+                            
+                            <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                                <!-- Consensus Rating -->
+                                <div class="mb-6 text-center">
+                                    <div class="inline-flex items-center justify-center w-32 h-32 rounded-full border-4 border-blue-400 mb-2">
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-black">BUY</div>
+                                            <div class="text-sm text-gray-500">Consensus</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="flex justify-between pb-2 border-b border-gray-100">
-                                    <span class="text-black">Net Income (TTM)</span>
-                                    <span class="text-black font-medium">-</span>
+                                
+                                <!-- Price Target -->
+                                <div class="mb-4">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-black">Price Target</span>
+                                        <span class="text-black font-medium">$225 (+10%)</span>
+                                    </div>
+                                    <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-blue-400" style="width: 75%"></div>
+                                    </div>
                                 </div>
-                                <div class="flex justify-between pb-2 border-b border-gray-100">
-                                    <span class="text-black">Profit Margin</span>
-                                    <span class="text-black font-medium">-</span>
+                                
+                                <!-- Recommendations -->
+                                <div class="space-y-2 mb-6">
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-black">Strong Buy</span>
+                                            <span class="text-black">18/35</span>
+                                        </div>
+                                        <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                                            <div class="h-full bg-blue-400" style="width: 51%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-black">Buy</span>
+                                            <span class="text-black">12/35</span>
+                                        </div>
+                                        <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                                            <div class="h-full bg-blue-400" style="width: 34%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-black">Hold</span>
+                                            <span class="text-black">4/35</span>
+                                        </div>
+                                        <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                                            <div class="h-full bg-blue-400" style="width: 11%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-black">Sell</span>
+                                            <span class="text-black">1/35</span>
+                                        </div>
+                                        <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                                            <div class="h-full bg-blue-400" style="width: 3%"></div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="flex justify-between pb-2 border-b border-gray-100">
-                                    <span class="text-black">Operating Margin</span>
-                                    <span class="text-black font-medium">-</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-black">Free Cash Flow (TTM)</span>
-                                    <span class="text-black font-medium">-</span>
+                                
+                                <!-- Estimates -->
+                                <div class="space-y-2">
+                                    <div class="flex justify-between pb-2 border-b border-gray-100">
+                                        <span class="text-black">Revenue Est (FY25)</span>
+                                        <span class="text-black font-medium">$390.2B</span>
+                                    </div>
+                                    <div class="flex justify-between pb-2 border-b border-gray-100">
+                                        <span class="text-black">EPS Est (FY25)</span>
+                                        <span class="text-black font-medium">$6.85</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-black">Growth Est (5yr)</span>
+                                        <span class="text-black font-medium">12.5%</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Main Action Button -->
-                    <div class="mb-6 text-center">
-                        <p class="mb-4 text-black">
-                            <strong>Pro Tip:</strong> For a comprehensive fundamental analysis including financial statements, valuation metrics, 
-                            peer comparison, and analyst sentiment, select a stock from the dropdown above.
-                        </p>
+                    <div class="mt-6 text-center">
                         <button type="button" id="viewFullFundamentals" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                             View Full Fundamental Analysis Dashboard
                         </button>

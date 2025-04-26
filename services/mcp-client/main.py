@@ -475,8 +475,14 @@ def create_news_processing_workflow():
             }}
             """.format(title=article.get("title", ""), text=text)
             
+            # Log that we're using Anthropic for news analysis
+            logger.info(f"Using Anthropic Claude API for news article analysis: title: {article.get('title', '')}")
+            
             # Process with Anthropic
             analysis = await process_text_with_anthropic(text, prompt)
+            
+            # Log successful API call
+            logger.info(f"Successfully called Anthropic API for news analysis of article from {article.get('source', 'unknown')}")
             
             # Combine article with analysis
             result = {**article, "analysis": analysis}

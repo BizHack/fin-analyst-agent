@@ -142,22 +142,114 @@ def test_sentiment_analysis(ticker="AAPL"):
     """
     logger.info(f"Testing sentiment analysis for {ticker}")
     
+    # Check if Backend API service is running
+    try:
+        health_response = requests.head(f"{BACKEND_API_URL}/health", timeout=2)
+        health_status = health_response.status_code < 400
+    except:
+        health_status = False
+    
+    if not health_status:
+        logger.warning(f"Backend API service not available at {BACKEND_API_URL}")
+        logger.info("Falling back to local sentiment analysis...")
+        
+        # Use local aggregator as fallback
+        try:
+            from agents.social_media_aggregator import analyze_aggregated_social_media
+            social_data = analyze_aggregated_social_media(ticker)
+            
+            # Calculate sentiment score from posts
+            posts = social_data.get("top_posts", [])
+            sentiment_score = sum(post.get("sentiment_score", 0.5) for post in posts) / max(len(posts), 1) if posts else 0.5
+            
+            # Extract information for display
+            sources = social_data.get("sources", ["Local Analysis"])
+            topics = [topic.get("title") for topic in social_data.get("trending_topics", [])[:3]]
+            last_updated = social_data.get("last_updated", "Just now")
+            
+            logger.info(f"Local sentiment analysis results for {ticker}:")
+            logger.info(f"Sentiment score: {sentiment_score:.2f}")
+            logger.info(f"Sources: {', '.join(sources)}")
+            logger.info(f"Trending topics: {', '.join(topics) if topics else 'None found'}")
+            logger.info(f"Last updated: {last_updated}")
+            logger.info(f"Post count: {len(posts)}")
+            
+            # Display sample posts
+            if posts:
+                logger.info("Sample posts:")
+                for i, post in enumerate(posts[:2]):
+                    content = post.get('content', '')
+                    if content:
+                        content = content[:50] + "..." if len(content) > 50 else content
+                    logger.info(f"Post {i+1}: {content} | Score: {post.get('sentiment_score', 'N/A')}")
+            
+            return
+        except Exception as fallback_e:
+            logger.error(f"Error in local fallback: {str(fallback_e)}")
+            return
+    
     try:
         # Note: In a real environment, this would require authentication
-        response = requests.get(f"{BACKEND_API_URL}/sentiment/{ticker}")
+        response = requests.get(f"{BACKEND_API_URL}/sentiment/{ticker}", timeout=5)
         
         if response.status_code == 200:
             sentiment_data = response.json()
             
+            logger.info(f"Backend API sentiment analysis results for {ticker}:")
             logger.info(f"Sentiment score: {sentiment_data.get('sentiment_score', 0.5)}")
             logger.info(f"Trending topics: {', '.join(sentiment_data.get('trending_topics', []))}")
             logger.info(f"Sources: {', '.join(sentiment_data.get('sources', []))}")
             logger.info(f"Document count: {len(sentiment_data.get('documents', []))}")
+            
+            # Display sample documents
+            documents = sentiment_data.get("documents", [])
+            if documents:
+                logger.info("Sample documents:")
+                for i, doc in enumerate(documents[:2]):
+                    content = doc.get('content', '')
+                    if content:
+                        content = content[:50] + "..." if len(content) > 50 else content
+                    logger.info(f"Doc {i+1}: {content} | Score: {doc.get('sentiment_score', 'N/A')}")
+            
         else:
             logger.error(f"Error fetching sentiment analysis: {response.status_code} - {response.text}")
+            logger.info("Falling back to local sentiment analysis...")
+            
+            # Use local aggregator as fallback after API error
+            try:
+                from agents.social_media_aggregator import analyze_aggregated_social_media
+                social_data = analyze_aggregated_social_media(ticker)
+                
+                # Calculate sentiment score from posts
+                posts = social_data.get("top_posts", [])
+                sentiment_score = sum(post.get("sentiment_score", 0.5) for post in posts) / max(len(posts), 1) if posts else 0.5
+                
+                logger.info(f"Local sentiment analysis results for {ticker}:")
+                logger.info(f"Sentiment score: {sentiment_score:.2f}")
+                logger.info(f"Sources: {', '.join(social_data.get('sources', ['Local Analysis']))}")
+                logger.info(f"Post count: {len(posts)}")
+            except Exception as fallback_e:
+                logger.error(f"Error in local fallback: {str(fallback_e)}")
     
     except Exception as e:
         logger.error(f"Error fetching sentiment analysis: {str(e)}")
+        logger.info("Falling back to local sentiment analysis after exception...")
+        
+        # Use local aggregator as fallback after exception
+        try:
+            from agents.social_media_aggregator import analyze_aggregated_social_media
+            social_data = analyze_aggregated_social_media(ticker)
+            
+            # Calculate sentiment score from posts
+            posts = social_data.get("top_posts", [])
+            sentiment_score = sum(post.get("sentiment_score", 0.5) for post in posts) / max(len(posts), 1) if posts else 0.5
+            
+            logger.info(f"Local sentiment analysis results for {ticker}:")
+            logger.info(f"Sentiment score: {sentiment_score:.2f}")
+            logger.info(f"Sources: {', '.join(social_data.get('sources', ['Local Analysis']))}")
+            logger.info(f"Post count: {len(posts)}")
+        except Exception as fallback_e:
+            logger.error(f"Error in local fallback: {str(fallback_e)}")
 
 if __name__ == "__main__":
     # Test Reddit social media processing

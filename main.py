@@ -6,11 +6,11 @@ import yfinance as yf
 import requests
 from werkzeug.security import generate_password_hash, check_password_hash
 from data.mock_data import get_market_data, get_politician_posts, get_agent_insights
-from agents.trump_agent import analyze_trump_posts
-from agents.politician_agent import analyze_politician_trades
-from agents.news_agent import analyze_news
-from agents.volume_spike_agent import analyze_volume_spikes
-from agents.social_media_aggregator import analyze_aggregated_social_media
+
+# MCP Service URLs
+MCP_SERVER_URL = os.environ.get("MCP_SERVER_URL", "http://localhost:8000")
+MCP_CLIENT_URL = os.environ.get("MCP_CLIENT_URL", "http://localhost:8001")
+BACKEND_API_URL = os.environ.get("BACKEND_API_URL", "http://localhost:8888")
 
 # Import the classes from the models file
 import models
@@ -145,36 +145,230 @@ def analyze_ticker():
         
         # Different analysis based on tab type
         if tab_type == 'sentiment':
-            social_posts = analyze_trump_posts(ticker)
-            sentiment_summary = "Based on recent social media analysis, " + ticker + " shows mixed sentiment with trending discussions about quarterly earnings and product launches."
-            return render_template('sentiment.html', 
-                                   ticker=ticker, 
-                                   posts=social_posts, 
-                                   summary=sentiment_summary)
+            # Get sentiment data from Backend API
+            try:
+                response = requests.get(f"{BACKEND_API_URL}/sentiment/{ticker}")
+                if response.status_code == 200:
+                    sentiment_data = response.json()
+                    # If no data returned, trigger data fetch through MCP
+                    if not sentiment_data.get("documents") or len(sentiment_data.get("documents", [])) == 0:
+                        # Trigger data fetch from MCP Server and processing through MCP Client
+                        logger.info(f"No sentiment data found for {ticker}, fetching from sources...")
+                        # Process news data for sentiment
+                        process_response = requests.post(
+                            f"{MCP_CLIENT_URL}/process/news",
+                            json={"source_type": "news", "source_name": "cnbc"}
+                        )
+                        if process_response.status_code == 200:
+                            workflow_id = process_response.json().get("workflow_id")
+                            logger.info(f"Started processing news for {ticker}, workflow ID: {workflow_id}")
+                        
+                        # Get existing demo data for now
+                        from agents.trump_agent import analyze_trump_posts
+                        sentiment_data = {
+                            "documents": analyze_trump_posts(ticker),
+                            "sentiment_score": 0.65,
+                            "trending_topics": ["Earnings Call", "Product Launch", "Market Share"],
+                        }
+                
+                # Build summary based on sentiment score
+                sentiment_score = sentiment_data.get("sentiment_score", 0.5)
+                if sentiment_score > 0.7:
+                    sentiment_type = "strongly positive"
+                elif sentiment_score > 0.5:
+                    sentiment_type = "moderately positive"
+                elif sentiment_score > 0.4:
+                    sentiment_type = "neutral"
+                elif sentiment_score > 0.2:
+                    sentiment_type = "moderately negative"
+                else:
+                    sentiment_type = "strongly negative"
+                
+                trending_topics = ", ".join(sentiment_data.get("trending_topics", ["earnings", "product launches"]))
+                sentiment_summary = f"Based on recent social media analysis, {ticker} shows {sentiment_type} sentiment with trending discussions about {trending_topics}."
+                
+                # Use the documents as posts
+                posts = sentiment_data.get("documents", [])
+                
+                return render_template('sentiment.html', 
+                                    ticker=ticker, 
+                                    posts=posts, 
+                                    summary=sentiment_summary)
+            
+            except Exception as e:
+                logger.error(f"Error getting sentiment data from Backend API: {str(e)}")
+                # Fallback to existing implementation
+                from agents.trump_agent import analyze_trump_posts
+                social_posts = analyze_trump_posts(ticker)
+                sentiment_summary = f"Based on recent social media analysis, {ticker} shows mixed sentiment with trending discussions about quarterly earnings and product launches."
+                return render_template('sentiment.html', 
+                                    ticker=ticker, 
+                                    posts=social_posts, 
+                                    summary=sentiment_summary)
             
         elif tab_type == 'politician_trades':
-            trades = analyze_politician_trades(ticker)
-            trade_summary = "Recent politician trading activity for " + ticker + " shows increased buying from representatives on the finance committee, suggesting potential positive outlook."
-            return render_template('politician_trades.html', 
-                                   ticker=ticker, 
-                                   trades=trades, 
-                                   summary=trade_summary)
+            # Get politician trades from Backend API
+            try:
+                response = requests.get(f"{BACKEND_API_URL}/politician-trades/{ticker}")
+                if response.status_code == 200:
+                    trades_data = response.json()
+                    trades = trades_data.get("trades", [])
+                    
+                    # Generate summary
+                    if trades:
+                        trade_count = len(trades)
+                        buy_count = sum(1 for t in trades if t.get("trade_type") == "BUY")
+                        sell_count = trade_count - buy_count
+                        if buy_count > sell_count:
+                            direction = "increased buying"
+                            outlook = "positive"
+                        elif sell_count > buy_count:
+                            direction = "increased selling"
+                            outlook = "negative"
+                        else:
+                            direction = "mixed trading"
+                            outlook = "neutral"
+                        
+                        trade_summary = f"Recent politician trading activity for {ticker} shows {direction} from representatives, suggesting potential {outlook} outlook."
+                    else:
+                        trade_summary = f"No recent politician trading activity detected for {ticker}."
+                    
+                    return render_template('politician_trades.html', 
+                                        ticker=ticker, 
+                                        trades=trades, 
+                                        summary=trade_summary)
+                
+                else:
+                    # Fallback to existing implementation
+                    from agents.politician_agent import analyze_politician_trades
+                    trades = analyze_politician_trades(ticker)
+                    trade_summary = f"Recent politician trading activity for {ticker} shows increased buying from representatives on the finance committee, suggesting potential positive outlook."
+                    return render_template('politician_trades.html', 
+                                        ticker=ticker, 
+                                        trades=trades, 
+                                        summary=trade_summary)
+            
+            except Exception as e:
+                logger.error(f"Error getting politician trades from Backend API: {str(e)}")
+                # Fallback to existing implementation
+                from agents.politician_agent import analyze_politician_trades
+                trades = analyze_politician_trades(ticker)
+                trade_summary = f"Recent politician trading activity for {ticker} shows increased buying from representatives on the finance committee, suggesting potential positive outlook."
+                return render_template('politician_trades.html', 
+                                    ticker=ticker, 
+                                    trades=trades, 
+                                    summary=trade_summary)
             
         elif tab_type == 'technical':
-            technical_data = analyze_volume_spikes(ticker)
-            technical_summary = ticker + " is showing a bullish pattern with support at $" + str(technical_data['support']) + " and resistance at $" + str(technical_data['resistance']) + ". Volume is " + technical_data['volume_status'] + "."
-            return render_template('technical_analysis.html', 
-                                   ticker=ticker, 
-                                   data=technical_data, 
-                                   summary=technical_summary)
+            # Get technical analysis from Backend API
+            try:
+                response = requests.get(f"{BACKEND_API_URL}/technical-analysis/{ticker}")
+                if response.status_code == 200:
+                    technical_data = response.json()
+                    indicators = technical_data.get("indicators", [])
+                    support_levels = technical_data.get("support_levels", [])
+                    resistance_levels = technical_data.get("resistance_levels", [])
+                    volume_analysis = technical_data.get("volume_analysis", {})
+                    
+                    # Calculate overall signal
+                    buy_signals = sum(1 for ind in indicators if ind.get("signal") == "BUY")
+                    sell_signals = sum(1 for ind in indicators if ind.get("signal") == "SELL")
+                    if buy_signals > sell_signals:
+                        pattern = "bullish"
+                    elif sell_signals > buy_signals:
+                        pattern = "bearish"
+                    else:
+                        pattern = "neutral"
+                    
+                    # Format summary
+                    support = support_levels[0] if support_levels else "N/A"
+                    resistance = resistance_levels[0] if resistance_levels else "N/A"
+                    volume_status = volume_analysis.get("volume_status", "NORMAL").replace("_", " ").lower()
+                    
+                    technical_summary = f"{ticker} is showing a {pattern} pattern with support at ${support} and resistance at ${resistance}. Volume is {volume_status}."
+                    
+                    return render_template('technical_analysis.html', 
+                                        ticker=ticker, 
+                                        data=technical_data, 
+                                        summary=technical_summary)
+                
+                else:
+                    # Fallback to existing implementation
+                    from agents.volume_spike_agent import analyze_volume_spikes
+                    technical_data = analyze_volume_spikes(ticker)
+                    technical_summary = f"{ticker} is showing a bullish pattern with support at ${technical_data['support']} and resistance at ${technical_data['resistance']}. Volume is {technical_data['volume_status']}."
+                    return render_template('technical_analysis.html', 
+                                        ticker=ticker, 
+                                        data=technical_data, 
+                                        summary=technical_summary)
+            
+            except Exception as e:
+                logger.error(f"Error getting technical analysis from Backend API: {str(e)}")
+                # Fallback to existing implementation
+                from agents.volume_spike_agent import analyze_volume_spikes
+                technical_data = analyze_volume_spikes(ticker)
+                technical_summary = f"{ticker} is showing a bullish pattern with support at ${technical_data['support']} and resistance at ${technical_data['resistance']}. Volume is {technical_data['volume_status']}."
+                return render_template('technical_analysis.html', 
+                                    ticker=ticker, 
+                                    data=technical_data, 
+                                    summary=technical_summary)
             
         elif tab_type == 'fundamentals':
-            fundamentals = analyze_news(ticker)
-            fundamental_summary = ticker + " reported quarterly earnings with revenue of $" + str(fundamentals['revenue']) + "B, " + fundamentals['eps_status'] + " analyst expectations. Guidance for next quarter is " + fundamentals['guidance'] + "."
-            return render_template('fundamentals.html', 
-                                   ticker=ticker, 
-                                   data=fundamentals, 
-                                   summary=fundamental_summary)
+            # Get fundamental analysis from Backend API
+            try:
+                response = requests.get(f"{BACKEND_API_URL}/fundamental-analysis/{ticker}")
+                if response.status_code == 200:
+                    fundamentals = response.json()
+                    
+                    # Format summary
+                    revenue = fundamentals.get("revenue_ttm", 0) / 1000000000  # Convert to billions
+                    eps = fundamentals.get("eps_ttm", 0)
+                    
+                    # Determine EPS status based on analyst ratings
+                    analyst_ratings = fundamentals.get("analyst_ratings", [])
+                    if analyst_ratings:
+                        buy_count = sum(1 for r in analyst_ratings if "buy" in r.get("rating", "").lower() or "overweight" in r.get("rating", "").lower())
+                        sell_count = sum(1 for r in analyst_ratings if "sell" in r.get("rating", "").lower() or "underweight" in r.get("rating", "").lower())
+                        if buy_count > sell_count:
+                            eps_status = "exceeding"
+                            guidance = "positive"
+                        elif sell_count > buy_count:
+                            eps_status = "below"
+                            guidance = "negative"
+                        else:
+                            eps_status = "meeting"
+                            guidance = "neutral"
+                    else:
+                        eps_status = "meeting"
+                        guidance = "neutral"
+                    
+                    fundamental_summary = f"{ticker} reported quarterly earnings with revenue of ${revenue:.2f}B, {eps_status} analyst expectations. Guidance for next quarter is {guidance}."
+                    
+                    return render_template('fundamentals.html', 
+                                        ticker=ticker, 
+                                        data=fundamentals, 
+                                        summary=fundamental_summary)
+                
+                else:
+                    # Fallback to existing implementation
+                    from agents.news_agent import analyze_news
+                    fundamentals = analyze_news(ticker)
+                    fundamental_summary = f"{ticker} reported quarterly earnings with revenue of ${fundamentals['revenue']}B, {fundamentals['eps_status']} analyst expectations. Guidance for next quarter is {fundamentals['guidance']}."
+                    return render_template('fundamentals.html', 
+                                        ticker=ticker, 
+                                        data=fundamentals, 
+                                        summary=fundamental_summary)
+            
+            except Exception as e:
+                logger.error(f"Error getting fundamental analysis from Backend API: {str(e)}")
+                # Fallback to existing implementation
+                from agents.news_agent import analyze_news
+                fundamentals = analyze_news(ticker)
+                fundamental_summary = f"{ticker} reported quarterly earnings with revenue of ${fundamentals['revenue']}B, {fundamentals['eps_status']} analyst expectations. Guidance for next quarter is {fundamentals['guidance']}."
+                return render_template('fundamentals.html', 
+                                    ticker=ticker, 
+                                    data=fundamentals, 
+                                    summary=fundamental_summary)
         
         else:
             return jsonify({"error": "Invalid tab type"}), 400
@@ -188,8 +382,30 @@ def social_media_overview():
     """Render the social media overview page with aggregated data."""
     ticker = request.args.get('ticker')
     
-    # Get aggregated social media data
-    social_data = analyze_aggregated_social_media(ticker)
+    try:
+        # Try to get data from the Backend API
+        response = requests.get(f"{BACKEND_API_URL}/sentiment/{ticker}")
+        if response.status_code == 200:
+            sentiment_data = response.json()
+            
+            # Format the data for the template
+            social_data = {
+                "ticker": ticker,
+                "sentiment_score": sentiment_data.get("sentiment_score", 0.5),
+                "trending_topics": sentiment_data.get("trending_topics", []),
+                "sources": sentiment_data.get("sources", ["Twitter", "Reddit", "News"]),
+                "posts": sentiment_data.get("documents", []),
+                "summary": f"Recent sentiment analysis for {ticker} shows a score of {sentiment_data.get('sentiment_score', 0.5):.2f} based on data from {', '.join(sentiment_data.get('sources', ['social media']))}."
+            }
+        else:
+            # Fallback to existing implementation
+            from agents.social_media_aggregator import analyze_aggregated_social_media
+            social_data = analyze_aggregated_social_media(ticker)
+    except Exception as e:
+        logger.error(f"Error getting social media data from Backend API: {str(e)}")
+        # Fallback to existing implementation
+        from agents.social_media_aggregator import analyze_aggregated_social_media
+        social_data = analyze_aggregated_social_media(ticker)
     
     # Render the social media overview template with the data
     return render_template('social_media_overview.html', **social_data)

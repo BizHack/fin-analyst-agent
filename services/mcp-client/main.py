@@ -33,7 +33,7 @@ app = FastAPI(
 )
 
 # Initialize Anthropic client
-client = anthropic.Anthropic(api_key=os.environ.get("ANTROPIC_API_KEY"))
+client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
 # Initialize connection to MongoDB
 mongo_client = MongoClient(os.environ.get("MONGODB_URI", "mongodb://mongoadmin:mongopass@mongodb:27017"))
@@ -96,8 +96,9 @@ async def process_text_with_anthropic(text, prompt_template):
         full_prompt = prompt_template.format(text=text)
         
         # Call Anthropic API
+        # the newest Anthropic model is "claude-3-5-sonnet-20241022" which was released October 22, 2024
         completion = client.messages.create(
-            model="claude-3-opus-20240229",
+            model="claude-3-5-sonnet-20241022",
             max_tokens=2000,
             temperature=0.0,
             system="You are a financial analyst assistant. Provide accurate, concise analysis of financial information.",

@@ -6,7 +6,7 @@ import requests
 from data.mock_data import get_market_data, get_politician_posts, get_agent_insights
 from agents.trump_agent import analyze_trump_posts
 from agents.politician_agent import analyze_politician_trades
-from agents.news_agent import analyze_news, analyze_news_sentiment
+from agents.news_agent import analyze_news
 from agents.volume_spike_agent import analyze_volume_spikes
 from agents.social_media_aggregator import analyze_aggregated_social_media
 
@@ -54,12 +54,10 @@ def analyze_ticker():
         # Different analysis based on tab type
         if tab_type == 'sentiment':
             social_posts = analyze_trump_posts(ticker)
-            news_sentiment = analyze_news_sentiment(ticker)
             sentiment_summary = "Based on recent social media analysis, " + ticker + " shows mixed sentiment with trending discussions about quarterly earnings and product launches."
             return render_template('sentiment.html', 
                                    ticker=ticker, 
                                    posts=social_posts, 
-                                   news_sentiment=news_sentiment,
                                    summary=sentiment_summary)
             
         elif tab_type == 'politician_trades':

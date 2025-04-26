@@ -8,6 +8,7 @@ from agents.trump_agent import analyze_trump_posts
 from agents.politician_agent import analyze_politician_trades
 from agents.news_agent import analyze_news
 from agents.volume_spike_agent import analyze_volume_spikes
+from agents.social_media_aggregator import analyze_aggregated_social_media
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -83,6 +84,17 @@ def analyze_ticker():
     except Exception as e:
         logger.error(f"Error analyzing ticker {ticker}: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+@app.route('/social_media', methods=['GET'])
+def social_media_overview():
+    """Render the social media overview page with aggregated data."""
+    ticker = request.args.get('ticker')
+    
+    # Get aggregated social media data
+    social_data = analyze_aggregated_social_media(ticker)
+    
+    # Render the social media overview template with the data
+    return render_template('social_media_overview.html', **social_data)
 
 @app.route('/simulate_event', methods=['POST'])
 def simulate_event():

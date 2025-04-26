@@ -8,7 +8,7 @@
                 <div class="mb-8 md:mb-0">
                     <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fade-in">
                         <span class="text-white">Fin</span>
-                        <span class="text-teal">Hacker</span>
+                        <span class="text-[#38bdf8]">Hacker</span>
                     </h1>
                     <p class="text-lg md:text-xl text-gray-300 animate-fade-in">
                         Decoding Signals from Politics, Markets, and Social Media
@@ -16,25 +16,21 @@
                 </div>
                 
                 <!-- Market Monitor Component -->
-                <div class="w-full md:w-auto">
-                    <div class="bg-slate-800 bg-opacity-50 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-slate-700">
-                        <h3 class="text-lg font-semibold mb-3">Market Pulse</h3>
-                        
-                        <div class="space-y-3">
-                            <!-- SPY -->
-                            <div class="flex items-center justify-between">
+                <div class="w-full md:w-auto flex flex-wrap gap-3 justify-end">
+                    <!-- SPY -->
+                    <div class="bg-white rounded-md px-4 py-2 shadow-md">
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 bg-white text-green-500 flex items-center justify-center mr-2">
+                                <span class="text-lg">$</span>
+                            </div>
+                            <div>
                                 <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-blue-500 bg-opacity-20 rounded-full flex items-center justify-center mr-3">
-                                        <i class="fas fa-chart-line text-blue-400"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium">S&P 500</p>
-                                        <p class="text-xs text-gray-400">SPY</p>
-                                    </div>
+                                    <p class="text-xs text-gray-500">SPY</p>
+                                    <p class="text-xs text-gray-400 ml-1">S&P 500</p>
                                 </div>
-                                <div class="text-right">
-                                    <p class="font-medium">${{ market_data.spy.price }}</p>
-                                    <p class="text-xs {% if market_data.spy.change_direction == 'up' %}text-green-400{% else %}text-red-400{% endif %}">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-800" id="spy-price">${{ market_data.spy.price }}</p>
+                                    <p id="spy-change" class="text-xs ml-2 {% if market_data.spy.change_direction == 'up' %}text-green-500{% else %}text-red-500{% endif %}">
                                         {% if market_data.spy.change_direction == 'up' %}
                                         <i class="fas fa-caret-up mr-1"></i>
                                         {% else %}
@@ -44,21 +40,23 @@
                                     </p>
                                 </div>
                             </div>
-                            
-                            <!-- BTC -->
-                            <div class="flex items-center justify-between">
+                        </div>
+                    </div>
+                    
+                    <!-- BTC -->
+                    <div class="bg-white rounded-md px-4 py-2 shadow-md">
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 bg-white text-amber-500 flex items-center justify-center mr-2">
+                                <span class="text-lg">₿</span>
+                            </div>
+                            <div>
                                 <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-amber-500 bg-opacity-20 rounded-full flex items-center justify-center mr-3">
-                                        <i class="fab fa-bitcoin text-amber-400"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium">Bitcoin</p>
-                                        <p class="text-xs text-gray-400">BTC-USD</p>
-                                    </div>
+                                    <p class="text-xs text-gray-500">BTC</p>
+                                    <p class="text-xs text-gray-400 ml-1">Bitcoin</p>
                                 </div>
-                                <div class="text-right">
-                                    <p class="font-medium">${{ market_data.bitcoin.price }}</p>
-                                    <p class="text-xs {% if market_data.bitcoin.change_direction == 'up' %}text-green-400{% else %}text-red-400{% endif %}">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-800" id="btc-price">${{ market_data.bitcoin.price }}</p>
+                                    <p id="btc-change" class="text-xs ml-2 {% if market_data.bitcoin.change_direction == 'up' %}text-green-500{% else %}text-red-500{% endif %}">
                                         {% if market_data.bitcoin.change_direction == 'up' %}
                                         <i class="fas fa-caret-up mr-1"></i>
                                         {% else %}
@@ -68,21 +66,23 @@
                                     </p>
                                 </div>
                             </div>
-                            
-                            <!-- Gold -->
-                            <div class="flex items-center justify-between">
+                        </div>
+                    </div>
+                    
+                    <!-- Gold -->
+                    <div class="bg-white rounded-md px-4 py-2 shadow-md">
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 bg-white text-yellow-500 flex items-center justify-center mr-2">
+                                <span class="text-lg">Au</span>
+                            </div>
+                            <div>
                                 <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-yellow-500 bg-opacity-20 rounded-full flex items-center justify-center mr-3">
-                                        <i class="fas fa-coins text-yellow-400"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium">Gold</p>
-                                        <p class="text-xs text-gray-400">GC=F</p>
-                                    </div>
+                                    <p class="text-xs text-gray-500">GOLD</p>
+                                    <p class="text-xs text-gray-400 ml-1">Gold</p>
                                 </div>
-                                <div class="text-right">
-                                    <p class="font-medium">${{ market_data.gold.price }}</p>
-                                    <p class="text-xs {% if market_data.gold.change_direction == 'up' %}text-green-400{% else %}text-red-400{% endif %}">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-800" id="gold-price">${{ market_data.gold.price }}</p>
+                                    <p id="gold-change" class="text-xs ml-2 {% if market_data.gold.change_direction == 'up' %}text-green-500{% else %}text-red-500{% endif %}">
                                         {% if market_data.gold.change_direction == 'up' %}
                                         <i class="fas fa-caret-up mr-1"></i>
                                         {% else %}
@@ -134,7 +134,7 @@
             
             <!-- Tab Content -->
             <div id="tab-content" class="animate-fade-in">
-                <!-- Content will be loaded here via AJAX -->
+                <!-- Sentiment Tab -->
                 <div id="sentiment-tab" class="tab-panel active">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6 border border-gray-100">
@@ -334,19 +334,279 @@
                     </div>
                 </div>
                 
+                <!-- Politician Trades Tab -->
                 <div id="politicians-tab" class="tab-panel hidden">
-                    <h3 class="text-xl font-semibold mb-4">Politician Trades Analysis</h3>
-                    <p>This panel will show politician trading activity for the selected stock.</p>
+                    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                        <div class="flex items-center mb-5">
+                            <i class="fas fa-landmark text-gray-500 mr-3"></i>
+                            <div>
+                                <h3 class="text-xl font-semibold">Political Trading Activity - <span class="ticker-symbol">AAPL</span></h3>
+                                <p class="text-gray-500 text-sm">Recent congressional stock transactions</p>
+                            </div>
+                        </div>
+                        
+                        <p class="text-gray-700 mb-6">
+                            Recent congressional trading activity shows 7 purchases and 3 sales of Apple stock in the last 30 days. Most notable was a $250,000 
+                            purchase by Rep. Johnson on April 10th, following the tech committee hearing. Senator Wallace sold $180,000 worth just before the 
+                            quarterly earnings announcement.
+                        </p>
+                        
+                        <!-- Trading Table -->
+                        <div class="overflow-x-auto mb-6">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Politician</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Party</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Context</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Rep. Michael Johnson</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="h-4 w-4 rounded-full bg-red-500 inline-block"></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 10, 2025</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-green-500 font-medium">BUY</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$250,000</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">After tech committee</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Sen. Maria Wallace</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="h-4 w-4 rounded-full bg-blue-500 inline-block"></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 15, 2025</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-500 font-medium">SELL</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$180,000</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Pre-earnings</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Rep. Thomas Lee</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="h-4 w-4 rounded-full bg-blue-500 inline-block"></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 8, 2025</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-green-500 font-medium">BUY</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$75,000</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">After product launch</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Sen. Robert Wilson</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="h-4 w-4 rounded-full bg-red-500 inline-block"></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 12, 2025</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-green-500 font-medium">BUY</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$120,000</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Standard disclosure</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Rep. Sarah Martinez</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="h-4 w-4 rounded-full bg-blue-500 inline-block"></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 14, 2025</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-500 font-medium">SELL</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$95,000</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Portfolio rebalance</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Trading Pattern Analysis -->
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="text-sm font-semibold mb-2">Trading Pattern Analysis</h4>
+                            <p class="text-sm text-gray-700">Unusual buying activity detected before product announcements. Correlation with committee assignments observed.</p>
+                        </div>
+                    </div>
                 </div>
                 
+                <!-- Technical Analysis Tab -->
                 <div id="technical-tab" class="tab-panel hidden">
-                    <h3 class="text-xl font-semibold mb-4">Technical Analysis</h3>
-                    <p>This panel will show technical indicators and price patterns for the selected stock.</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <h3 class="text-xl font-semibold mb-2">Technical Analysis - <span class="ticker-symbol">AAPL</span></h3>
+                            <p class="text-gray-500 text-sm mb-6">Price action and technical patterns</p>
+                            
+                            <p class="text-gray-700 mb-6">
+                                Apple shows strong technical signals with the stock trading above both 50-day and 
+                                200-day moving averages. Multiple support levels have held in recent tests. Current 
+                                price action suggests consolidation after the recent breakout above $198, with 
+                                significant resistance at $210. RSI indicates slightly overbought conditions at 72.
+                            </p>
+                            
+                            <!-- Chart Placeholder -->
+                            <div class="w-full h-64 bg-gray-50 rounded-lg mb-4 flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="w-full h-64 relative">
+                                        <!-- Mock Chart (Simplified) -->
+                                        <svg class="w-full h-full" viewBox="0 0 400 200" preserveAspectRatio="none">
+                                            <!-- Price Line -->
+                                            <path d="M0,140 C20,120 40,100 60,95 S100,90 120,85 S160,70 180,60 S220,40 240,30 S280,20 300,15 S340,5 400,5" 
+                                                  stroke="#38bdf8" stroke-width="2" fill="none" />
+                                            
+                                            <!-- MA50 Line -->
+                                            <path d="M0,150 C40,130 80,110 120,95 S160,80 200,70 S240,50 280,40 S320,30 400,25" 
+                                                  stroke="#9ca3af" stroke-width="1.5" fill="none" />
+                                            
+                                            <!-- MA200 Line -->
+                                            <path d="M0,170 C40,160 80,150 120,140 S160,130 200,120 S240,110 280,90 S320,80 400,70" 
+                                                  stroke="#22c55e" stroke-width="1.5" fill="none" />
+                                            
+                                            <!-- Volume Bars (Simplified) -->
+                                            <g class="volume-bars">
+                                                <rect x="0" y="190" width="10" height="10" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="20" y="190" width="10" height="20" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="40" y="190" width="10" height="15" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="60" y="190" width="10" height="25" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="80" y="190" width="10" height="30" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="100" y="190" width="10" height="20" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="120" y="190" width="10" height="15" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="140" y="190" width="10" height="10" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="160" y="190" width="10" height="20" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="180" y="190" width="10" height="25" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="200" y="190" width="10" height="40" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="220" y="190" width="10" height="35" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="240" y="190" width="10" height="20" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="260" y="190" width="10" height="15" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="280" y="190" width="10" height="30" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="300" y="190" width="10" height="35" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="320" y="190" width="10" height="40" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="340" y="190" width="10" height="30" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="360" y="190" width="10" height="15" fill="#9ca3af" opacity="0.3"></rect>
+                                                <rect x="380" y="190" width="10" height="20" fill="#9ca3af" opacity="0.3"></rect>
+                                            </g>
+                                            
+                                            <!-- Chart Labels -->
+                                            <text x="5" y="20" class="text-xs fill-gray-500">205</text>
+                                            <text x="5" y="70" class="text-xs fill-gray-500">200</text>
+                                            <text x="5" y="120" class="text-xs fill-gray-500">195</text>
+                                            <text x="5" y="170" class="text-xs fill-gray-500">190</text>
+                                            
+                                            <!-- Date Labels -->
+                                            <text x="0" y="195" class="text-xs fill-gray-500">Apr 1</text>
+                                            <text x="60" y="195" class="text-xs fill-gray-500">Apr 5</text>
+                                            <text x="120" y="195" class="text-xs fill-gray-500">Apr 10</text>
+                                            <text x="180" y="195" class="text-xs fill-gray-500">Apr 15</text>
+                                            <text x="240" y="195" class="text-xs fill-gray-500">Apr 20</text>
+                                            <text x="300" y="195" class="text-xs fill-gray-500">Apr 25</text>
+                                        </svg>
+                                        
+                                        <!-- Legend -->
+                                        <div class="absolute bottom-0 right-0 bg-white bg-opacity-60 p-1 text-xs">
+                                            <div class="flex items-center">
+                                                <div class="w-3 h-0.5 bg-blue-400 mr-1"></div>
+                                                <span class="text-gray-700">price</span>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <div class="w-3 h-0.5 bg-gray-400 mr-1"></div>
+                                                <span class="text-gray-700">ma50</span>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <div class="w-3 h-0.5 bg-green-500 mr-1"></div>
+                                                <span class="text-gray-700">ma200</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Technical Patterns -->
+                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <h3 class="text-xl font-semibold mb-2">Technical Patterns</h3>
+                            <p class="text-gray-500 text-sm mb-6">Detected chart patterns and signals</p>
+                            
+                            <div class="space-y-4">
+                                <!-- Pattern 1 -->
+                                <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                    <div>
+                                        <p class="font-medium">Recent Breakout</p>
+                                        <p class="flex items-center">
+                                            <span class="text-xs mr-2 bg-green-100 text-green-800 px-2 py-0.5 rounded">High</span>
+                                            <span class="text-sm text-gray-500">Status: Confirmed</span>
+                                        </p>
+                                    </div>
+                                    <div class="text-sm text-gray-700">
+                                        Target: $215
+                                    </div>
+                                </div>
+                                
+                                <!-- Pattern 2 -->
+                                <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                    <div>
+                                        <p class="font-medium">Cup and Handle</p>
+                                        <p class="flex items-center">
+                                            <span class="text-xs mr-2 bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">Medium</span>
+                                            <span class="text-sm text-gray-500">Status: Forming</span>
+                                        </p>
+                                    </div>
+                                    <div class="text-sm text-gray-700">
+                                        Target: $225
+                                    </div>
+                                </div>
+                                
+                                <!-- Pattern 3 -->
+                                <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                    <div>
+                                        <p class="font-medium">Support Level</p>
+                                        <p class="flex items-center">
+                                            <span class="text-xs mr-2 bg-green-100 text-green-800 px-2 py-0.5 rounded">High</span>
+                                            <span class="text-sm text-gray-500">Status: Holding</span>
+                                        </p>
+                                    </div>
+                                    <div class="text-sm text-gray-700">
+                                        Target: $195
+                                    </div>
+                                </div>
+                                
+                                <!-- Pattern 4 -->
+                                <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                    <div>
+                                        <p class="font-medium">Resistance Level</p>
+                                        <p class="flex items-center">
+                                            <span class="text-xs mr-2 bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">Medium</span>
+                                            <span class="text-sm text-gray-500">Status: Testing</span>
+                                        </p>
+                                    </div>
+                                    <div class="text-sm text-gray-700">
+                                        Target: $210
+                                    </div>
+                                </div>
+                                
+                                <!-- Key Levels -->
+                                <div class="pt-2">
+                                    <h4 class="text-sm font-semibold mb-2">Key Technical Levels</h4>
+                                    <div class="grid grid-cols-2 gap-2 text-sm">
+                                        <div>
+                                            <p class="text-gray-600">Resistance:</p>
+                                            <p class="text-gray-800">$210, $215, $225</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-600">Support:</p>
+                                            <p class="text-gray-800">$198, $195, $190</p>
+                                        </div>
+                                        <div class="col-span-2">
+                                            <p class="text-gray-600">RSI:</p>
+                                            <p class="text-yellow-600">72 (Overbought)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
+                <!-- Fundamental Tab -->
                 <div id="fundamental-tab" class="tab-panel hidden">
                     <h3 class="text-xl font-semibold mb-4">Fundamental Analysis</h3>
-                    <p>This panel will show fundamental data and earnings analysis for the selected stock.</p>
+                    <p>Loading fundamental data for the selected stock...</p>
                 </div>
             </div>
         </div>

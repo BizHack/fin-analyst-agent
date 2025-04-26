@@ -6,11 +6,33 @@ import datetime
 import requests
 import os
 import json
+import time
 
 # Import specific platform agents
 from agents.trump_agent import analyze_trump_posts
 
 logger = logging.getLogger(__name__)
+
+def log_anthropic_api_usage(operation, ticker, start_time=None, success=None, error=None):
+    """
+    Log information about Anthropic API usage for sentiment analysis
+    
+    Args:
+        operation (str): The operation being performed (e.g., "sentiment_analysis")
+        ticker (str): The ticker symbol being analyzed
+        start_time (float, optional): The start time of the operation (as returned by time.time())
+        success (bool, optional): Whether the operation was successful
+        error (str, optional): Error message if the operation failed
+    """
+    if start_time and success is not None:
+        duration = round((time.time() - start_time) * 1000)  # Convert to milliseconds
+        if success:
+            logger.info(f"ANTHROPIC API: Successfully completed {operation} for {ticker} in {duration}ms")
+        else:
+            logger.error(f"ANTHROPIC API: Failed {operation} for {ticker} after {duration}ms: {error}")
+    else:
+        logger.info(f"ANTHROPIC API: Starting {operation} for {ticker}")
+        return time.time()  # Return start time for later use
 
 # Environment variables for API connections
 MCP_CLIENT_URL = os.environ.get("MCP_CLIENT_URL", "http://localhost:8001")
@@ -93,7 +115,8 @@ def analyze_aggregated_social_media(ticker=None):
         logger.warning("No data from API calls, using Trump agent as fallback")
         trump_posts = analyze_trump_posts(ticker)
         social_posts.extend(trump_posts)
-        sources.append("Fallback Source")
+        sources.append("Truth Social")  # We're using the Trump agent as Truth Social data
+        logger.info(f"Added {len(trump_posts)} ticker-specific posts for {ticker} from Truth Social fallback")
     
     # Calculate sentiment statistics
     positive_count = sum(1 for post in social_posts if post.get('sentiment_score', 0) > 0.7)

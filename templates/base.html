@@ -88,60 +88,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Custom JS -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Tab switching functionality
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabPanels = document.querySelectorAll('.tab-panel');
-            const stockSelect = document.getElementById('stock-select');
-            
-            if (tabButtons.length > 0) {
-                tabButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        // Remove active class from all buttons
-                        tabButtons.forEach(btn => btn.classList.remove('active'));
-                        
-                        // Add active class to clicked button
-                        button.classList.add('active');
-                        
-                        // Hide all tab panels
-                        tabPanels.forEach(panel => panel.classList.add('hidden'));
-                        tabPanels.forEach(panel => panel.classList.remove('active'));
-                        
-                        // Show the corresponding panel
-                        const tabId = button.getAttribute('data-tab');
-                        const activePanel = document.getElementById(`${tabId}-tab`);
-                        if (activePanel) {
-                            activePanel.classList.remove('hidden');
-                            activePanel.classList.add('active');
-                        }
-                    });
-                });
-            }
-            
-            // Stock selection
-            if (stockSelect) {
-                stockSelect.addEventListener('change', () => {
-                    const selectedStock = stockSelect.value;
-                    const tickerSymbols = document.querySelectorAll('.ticker-symbol');
-                    
-                    // Update ticker symbols in the content
-                    tickerSymbols.forEach(el => {
-                        el.textContent = selectedStock;
-                    });
-                    
-                    // Here you would typically fetch new data for the selected stock
-                    console.log(`Selected stock: ${selectedStock}`);
-                    
-                    // For demo purposes, we'll just reload the current tab
-                    const activeTab = document.querySelector('.tab-button.active');
-                    if (activeTab) {
-                        activeTab.click();
-                    }
-                });
-            }
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     
     <style>
         .tab-button {

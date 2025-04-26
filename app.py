@@ -35,6 +35,12 @@ def index():
                            politician_posts=politician_posts,
                            agent_insights=agent_insights)
 
+@app.route('/market_data')
+def market_data():
+    """Get the latest market data."""
+    data = get_market_data()
+    return jsonify(data)
+
 @app.route('/analyze_ticker', methods=['POST'])
 def analyze_ticker():
     """Analyze a ticker symbol based on the tab type."""

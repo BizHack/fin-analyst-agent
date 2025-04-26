@@ -252,7 +252,16 @@ def analyze_ticker():
                 else:
                     sentiment_type = "strongly negative"
                 
-                trending_topics = ", ".join(sentiment_data.get("trending_topics", ["earnings", "product launches"]))
+                # Handle trending topics properly - they might be a list of dictionaries or strings
+                trending_topics_data = sentiment_data.get("trending_topics", [])
+                if trending_topics_data and isinstance(trending_topics_data[0], dict):
+                    # If it's a list of dictionaries, extract the 'title' fields
+                    trending_topic_titles = [topic.get("title", "market trends") for topic in trending_topics_data[:3]]
+                    trending_topics = ", ".join(trending_topic_titles)
+                else:
+                    # If it's already a list of strings (or empty), join as is
+                    trending_topics = ", ".join(trending_topics_data) if trending_topics_data else "earnings, product launches"
+                
                 sentiment_summary = f"Based on recent social media analysis, {ticker} shows {sentiment_type} sentiment with trending discussions about {trending_topics}."
                 
                 # Use the documents as posts
@@ -312,8 +321,19 @@ def analyze_ticker():
                 else:
                     sentiment_type = "strongly negative"
                 
-                trending_topics = ", ".join(social_data.get("trending_topics", ["earnings", "product launches"]))
-                sources = ", ".join(social_data.get("sources", ["Reddit", "Truth Social"]))
+                # Extract the titles from trending topics if they are dictionaries
+                trending_topics_data = social_data.get("trending_topics", [])
+                if trending_topics_data and isinstance(trending_topics_data[0], dict):
+                    # Extract the 'title' field from each trending topic dictionary
+                    trending_topic_titles = [topic.get("title", "market trends") for topic in trending_topics_data[:3]]
+                    trending_topics = ", ".join(trending_topic_titles)
+                else:
+                    # Fallback to default or use as-is if they're already strings
+                    trending_topics = ", ".join(trending_topics_data) if trending_topics_data else "earnings, product launches"
+                
+                # Get sources as a comma-separated string
+                sources_list = social_data.get("sources", ["Reddit", "Truth Social"])
+                sources = ", ".join(sources_list)
                 
                 sentiment_summary = f"Based on recent analysis from {sources}, {ticker} shows {sentiment_type} sentiment with trending discussions about {trending_topics}."
                 
